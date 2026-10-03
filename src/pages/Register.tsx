@@ -130,15 +130,14 @@ export default function Register() {
             </FormField>
           </div>
 
-          <FormField label={tr.auth_register_email} required error={tErr(infoForm.formState.errors.email?.message)}>
-            <Controller
-              control={infoForm.control}
-              name="email"
-              render={({ field }) => <Input type="email" placeholder={tr.auth_register_email_ph} {...field} />}
-            />
-          </FormField>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
+            <FormField label={tr.auth_register_email} required error={tErr(infoForm.formState.errors.email?.message)}>
+              <Controller
+                control={infoForm.control}
+                name="email"
+                render={({ field }) => <Input type="email" placeholder={tr.auth_register_email_ph} {...field} />}
+              />
+            </FormField>
             <FormField label={tr.auth_register_username} required error={tErr(infoForm.formState.errors.username?.message)}>
               <Controller
                 control={infoForm.control}
@@ -146,7 +145,7 @@ export default function Register() {
                 render={({ field }) => <Input placeholder={tr.auth_register_username_ph} {...field} />}
               />
             </FormField>
-            </div>
+          </div>
 
           <Button type="submit" variant="primary" className="w-full mt-1">
             {tr.auth_register_continue}
