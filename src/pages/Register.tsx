@@ -130,7 +130,7 @@ export default function Register() {
             </FormField>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
             <FormField label={tr.auth_register_email} required error={tErr(infoForm.formState.errors.email?.message)}>
               <Controller
                 control={infoForm.control}
