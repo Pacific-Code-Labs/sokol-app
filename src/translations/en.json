@@ -278,7 +278,8 @@
       "demo_draft_unavailable": "This draft is unavailable. Check the original demo link.",
       "demo_draft_error": "We could not save your project. Your draft is still available; you can retry.",
       "demo_draft_quota": "You reached your plan’s project limit. The draft is available until it expires; free a project slot and retry.",
-      "demo_draft_retry": "Retry"
+      "demo_draft_retry": "Retry",
+      "demo_draft_discard": "Continue without the demo project"
     },
     "navigation": {
       "nav_workspace": "Workspace",

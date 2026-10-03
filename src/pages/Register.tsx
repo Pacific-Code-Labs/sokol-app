@@ -15,7 +15,7 @@ import {
   type RegisterInfoForm,
   type RegisterPasswordForm,
 } from "@/lib/authSchemas";
-import { postAuthPath, pendingDemoDraft } from "@/lib/demoDraft";
+import { postAuthPath, pendingDemoDraft, clearDemoDraft } from "@/lib/demoDraft";
 import { localizedPath } from "@/lib/paths";
 
 type Step = "info" | "password";
@@ -25,6 +25,7 @@ export default function Register() {
   const { signUp, user, loading: authLoading } = useAuth();
   const { lang, tr } = useLang();
 
+  const [pendingDraft, setPendingDraft] = useState(pendingDemoDraft);
   const [step, setStep] = useState<Step>("info");
   const [infoData, setInfoData] = useState<RegisterInfoForm | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +105,12 @@ export default function Register() {
         </div>
       }
     >
-      {pendingDemoDraft() && <p className="mb-4 text-sm text-muted-foreground">{tr.demo_draft_pending}</p>}
+      {pendingDraft && <div className="mb-4 space-y-2 text-sm text-muted-foreground">
+        <p>{tr.demo_draft_pending}</p>
+        <Button variant="ghost" size="sm" onClick={() => {
+          clearDemoDraft(pendingDraft.draftId); setPendingDraft(null);
+        }}>{tr.demo_draft_discard}</Button>
+      </div>}
       {step === "info" ? (
         <form onSubmit={infoForm.handleSubmit(handleInfoSubmit)} className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">

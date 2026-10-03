@@ -278,7 +278,8 @@
       "demo_draft_unavailable": "Este borrador no está disponible. Revisa el enlace original del demo.",
       "demo_draft_error": "No pudimos guardar tu proyecto. El borrador sigue disponible; puedes reintentar.",
       "demo_draft_quota": "Alcanzaste el límite de proyectos de tu plan. El borrador sigue disponible hasta su vencimiento; libera un espacio y reintenta.",
-      "demo_draft_retry": "Reintentar"
+      "demo_draft_retry": "Reintentar",
+      "demo_draft_discard": "Continuar sin el proyecto demo"
     },
     "navigation": {
       "nav_workspace": "Espacio de trabajo",
