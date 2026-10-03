@@ -270,7 +270,15 @@
       "demoIntakeSubmit": "Create preview",
       "demoCtaQuestion": "Want the full evaluation with requirements, NFPA standards and Costa Rica context?",
       "demoCtaButton": "Sign up free",
-      "demoFollowupLabel": "Keep exploring"
+      "demoFollowupLabel": "Keep exploring",
+      "demo_draft_title": "Save your demo project",
+      "demo_draft_pending": "Your demo project is ready to save after you verify your account and sign in.",
+      "demo_draft_saving": "Saving your demo project…",
+      "demo_draft_expired": "The demo draft expired after 24 hours. Return to the demo to create another.",
+      "demo_draft_unavailable": "This draft is unavailable. Check the original demo link.",
+      "demo_draft_error": "We could not save your project. Your draft is still available; you can retry.",
+      "demo_draft_quota": "You reached your plan’s project limit. The draft is available until it expires; free a project slot and retry.",
+      "demo_draft_retry": "Retry"
     },
     "navigation": {
       "nav_workspace": "Workspace",

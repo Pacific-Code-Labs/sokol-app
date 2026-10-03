@@ -10,6 +10,7 @@ import { useLang } from "@/contexts/LangContext";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { PasswordField } from "@/components/auth/PasswordField";
 import { emailSchema } from "@/lib/authSchemas";
+import { postAuthPath } from "@/lib/demoDraft";
 import { localizedPath } from "@/lib/paths";
 import { landingHref } from "@/lib/site-links";
 
@@ -26,7 +27,7 @@ export default function Login() {
   const location = useLocation();
   // redirectAfterLogin: RequireAuth stores the intended (already lang-prefixed)
   // path in location.state.from; default to this lang's dashboard.
-  const from = (location.state as { from?: string } | null)?.from ?? localizedPath(lang, "/dashboard");
+  const from = postAuthPath(lang, (location.state as { from?: string } | null)?.from ?? localizedPath(lang, "/dashboard"));
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);

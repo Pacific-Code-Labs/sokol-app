@@ -1,6 +1,7 @@
 import "./config/amplify";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import { captureDemoDraft } from "./lib/demoDraft";
 // FCR-003: the shared design-system's token defaults. Imported BEFORE
 // index.css so Sóköl's index.css (the SOURCE of these same token names)
 // wins the cascade and stays the live light/dark values. Both files define
@@ -19,6 +20,7 @@ import { initContent, refreshContent } from "./repositories/content.repository";
 // Stale-while-revalidate: render at once from the last published copy this browser saw (or the
 // bundled JSON), then fetch the published documents in the background and re-render only when
 // they changed. A cold content API never delays the first paint.
+captureDemoDraft();
 initContent();
 initBrand();
 const root = createRoot(document.getElementById("root")!);

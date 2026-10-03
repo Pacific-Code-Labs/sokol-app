@@ -585,6 +585,19 @@ export const sokolApi = {
   },
 
   /** POST /projects — create. Throws QuotaError on HTTP 402 (saved-projects limit). */
+  async claimDemoProject(body: { draftId: string; claimToken: string }): Promise<{ projectId: string }> {
+    const headers = await authHeader();
+    try {
+      return await resolveBody<{ projectId: string }>(post({
+        apiName: API_NAME, path: "/projects/from-demo-draft", options: { headers, body },
+      }));
+    } catch (err: unknown) {
+      const quota = await parseQuota(err, 402);
+      if (quota) throw quota;
+      throw err;
+    }
+  },
+
   async createProject(body: ProjectCreateRequest): Promise<ProjectResponse> {
     const headers = await authHeader();
     try {

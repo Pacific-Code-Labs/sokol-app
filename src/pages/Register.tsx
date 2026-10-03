@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
@@ -15,13 +15,14 @@ import {
   type RegisterInfoForm,
   type RegisterPasswordForm,
 } from "@/lib/authSchemas";
+import { postAuthPath, pendingDemoDraft } from "@/lib/demoDraft";
 import { localizedPath } from "@/lib/paths";
 
 type Step = "info" | "password";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp, user, loading: authLoading } = useAuth();
   const { lang, tr } = useLang();
 
   const [step, setStep] = useState<Step>("info");
@@ -79,7 +80,7 @@ export default function Register() {
         sessionStorage.setItem("verificationPassword", values.password);
         navigate(localizedPath(lang, "/verify-email"));
       } else {
-        navigate(localizedPath(lang, "/dashboard"), { replace: true });
+        navigate(postAuthPath(lang), { replace: true });
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : tr.auth_register_error);
@@ -87,6 +88,8 @@ export default function Register() {
       setSubmitting(false);
     }
   };
+
+  if (!authLoading && user) return <Navigate to={postAuthPath(lang)} replace />;
 
   return (
     <AuthShell
@@ -101,6 +104,7 @@ export default function Register() {
         </div>
       }
     >
+      {pendingDemoDraft() && <p className="mb-4 text-sm text-muted-foreground">{tr.demo_draft_pending}</p>}
       {step === "info" ? (
         <form onSubmit={infoForm.handleSubmit(handleInfoSubmit)} className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">

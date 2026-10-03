@@ -5,6 +5,7 @@ import { Button, FormField, OtpInput } from "@pacific-code-labs/sokol-design-sys
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { postAuthPath } from "@/lib/demoDraft";
 import { localizedPath } from "@/lib/paths";
 
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -56,7 +57,7 @@ export default function VerifyEmail() {
       // Auto sign-in after verification. The user row + personal org were saved by the
       // PostConfirmation trigger (the API re-checks on the first authenticated call — FCR-008/021).
       const password = sessionStorage.getItem("verificationPassword");
-      const redirectTo = sessionStorage.getItem("redirectAfterLogin") ?? localizedPath(lang, "/dashboard");
+      const redirectTo = postAuthPath(lang, sessionStorage.getItem("redirectAfterLogin") ?? localizedPath(lang, "/dashboard"));
       if (password) {
         await signIn(email, password);
       }

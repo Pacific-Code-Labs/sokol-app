@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage.tsx";
 import RolesPage from "./pages/RolesPage.tsx";
 import NewOrganization from "./pages/NewOrganization.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import DemoProject from "./pages/DemoProject.tsx";
 import Projects from "./pages/Projects.tsx";
 import NewProject from "./pages/NewProject.tsx";
 import ProjectDetail from "./pages/ProjectDetail.tsx";
@@ -88,6 +89,7 @@ const App = () => (
                   <Route path="dashboard/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
                   <Route path="dashboard/roles" element={<RequireAuth><RolesPage /></RequireAuth>} />
                   <Route path="organizations/new" element={<RequireAuth><NewOrganization /></RequireAuth>} />
+                  <Route path="demo-project" element={<RequireAuth><DemoProject /></RequireAuth>} />
                   <Route path="projects" element={<RequireAuth><Projects /></RequireAuth>} />
                   <Route path="projects/new" element={<RequireAuth><NewProject /></RequireAuth>} />
                   <Route path="projects/electrical" element={<RequireAuth><ElectricalProject /></RequireAuth>} />

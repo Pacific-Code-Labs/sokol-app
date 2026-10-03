@@ -270,7 +270,15 @@
       "demoIntakeSubmit": "Crear vista previa",
       "demoCtaQuestion": "¿Quieres la evaluación completa con requisitos, normas NFPA y contexto de Costa Rica?",
       "demoCtaButton": "Regístrate gratis",
-      "demoFollowupLabel": "Sigue explorando"
+      "demoFollowupLabel": "Sigue explorando",
+      "demo_draft_title": "Guardar tu proyecto demo",
+      "demo_draft_pending": "Tu proyecto demo está listo para guardarse después de verificar tu cuenta e iniciar sesión.",
+      "demo_draft_saving": "Guardando tu proyecto demo…",
+      "demo_draft_expired": "El borrador demo venció después de 24 horas. Vuelve al demo para crear uno nuevo.",
+      "demo_draft_unavailable": "Este borrador no está disponible. Revisa el enlace original del demo.",
+      "demo_draft_error": "No pudimos guardar tu proyecto. El borrador sigue disponible; puedes reintentar.",
+      "demo_draft_quota": "Alcanzaste el límite de proyectos de tu plan. El borrador sigue disponible hasta su vencimiento; libera un espacio y reintenta.",
+      "demo_draft_retry": "Reintentar"
     },
     "navigation": {
       "nav_workspace": "Espacio de trabajo",
