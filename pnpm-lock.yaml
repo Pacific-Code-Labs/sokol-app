@@ -15,8 +15,8 @@ importers:
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.89.0(@types/react@18.3.31)(react@18.3.1))
       '@pacific-code-labs/sokol-design-system':
-        specifier: github:Pacific-Code-Labs/sokol-design-system#v0.5.3
-        version: https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/77fc306266899b2e68b8684f707b17e8ae233fad(4a060944e5ac0ad115e0ccfb43ed54bd)
+        specifier: github:Pacific-Code-Labs/sokol-design-system#v0.5.4
+        version: https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/254b787d0189987e1f4b61bd905c6bf5d9f7b3ee(4a060944e5ac0ad115e0ccfb43ed54bd)
       '@radix-ui/react-accordion':
         specifier: ^1.2.11
         version: 1.2.20(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -644,9 +644,9 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@pacific-code-labs/sokol-design-system@https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/77fc306266899b2e68b8684f707b17e8ae233fad':
-    resolution: {tarball: https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/77fc306266899b2e68b8684f707b17e8ae233fad}
-    version: 0.5.3
+  '@pacific-code-labs/sokol-design-system@https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/254b787d0189987e1f4b61bd905c6bf5d9f7b3ee':
+    resolution: {tarball: https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/254b787d0189987e1f4b61bd905c6bf5d9f7b3ee}
+    version: 0.5.4
     peerDependencies:
       '@radix-ui/react-accordion': ^1.2.0
       '@radix-ui/react-alert-dialog': ^1.1.0
@@ -3806,7 +3806,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.3
 
-  '@pacific-code-labs/sokol-design-system@https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/77fc306266899b2e68b8684f707b17e8ae233fad(4a060944e5ac0ad115e0ccfb43ed54bd)':
+  '@pacific-code-labs/sokol-design-system@https://codeload.github.com/Pacific-Code-Labs/sokol-design-system/tar.gz/254b787d0189987e1f4b61bd905c6bf5d9f7b3ee(4a060944e5ac0ad115e0ccfb43ed54bd)':
     dependencies:
       '@radix-ui/react-accordion': 1.2.20(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-alert-dialog': 1.1.23(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
