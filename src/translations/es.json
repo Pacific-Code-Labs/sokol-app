@@ -227,7 +227,10 @@
       "demo_limit_cta_fallback": "Regístrate gratis",
       "quota_projects_fallback": "Alcanzaste el límite de proyectos guardados de tu plan. Mejora tu plan para guardar más.",
       "quota_evaluate_fallback": "Alcanzaste el límite mensual de evaluaciones de tu plan. Mejora tu plan para seguir evaluando.",
-      "upgrade_tier_current": "actual"
+      "upgrade_tier_current": "actual",
+      "lang_toggle_label": "Idioma",
+      "lang_toggle_spanish": "Español",
+      "lang_toggle_english": "English"
     },
     "demo": {
       "demoWelcomeTitle": "Tu ingeniero de protección contra incendios, al instante.",

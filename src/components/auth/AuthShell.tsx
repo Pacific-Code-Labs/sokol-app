@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { BrandLogo, Card, CardBody, CardHeader, CardTitle, CardDescription } from "@pacific-code-labs/sokol-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { getBrandingVM } from "@/services/branding.service";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 /**
@@ -32,8 +33,9 @@ export function AuthShell({
   const brand = getBrandingVM(lang);
   return (
     <div className="min-h-[100dvh] grid place-items-center bg-background px-4 py-10 relative">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex items-center gap-2">
         <ThemeToggle />
+        <LanguageToggle />
       </div>
       <div className="w-full max-w-md">
         {/* Brand lockup only (not a link): "back" on each screen leads to the landing. */}

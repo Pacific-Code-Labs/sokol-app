@@ -1,0 +1,29 @@
+import { useState } from "react";
+import { beforeEach, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { PageTransition } from "@/components/PageTransition";
+vi.mock("@/contexts/LangContext", () => ({ useLang: () => {
+  const location = useLocation();
+  return { lang: location.pathname.startsWith("/en") ? "en" : "es", tr: {
+    lang_toggle_label: "Language", lang_toggle_spanish: "Español", lang_toggle_english: "English",
+  } };
+} }));
+beforeEach(() => { document.body.className = ""; });
+it("uses SVG flag buttons and preserves the route, query and entered form data", async () => {
+  function Form() { const [value, setValue] = useState(""); return <input aria-label="Name" value={value} onChange={(e) => setValue(e.target.value)} />; }
+  function Harness() {
+    const location = useLocation();
+    return <><LanguageToggle /><p>{location.pathname + location.search}</p><PageTransition><Form /></PageTransition></>;
+  }
+  render(<MemoryRouter initialEntries={["/es/register?source=demo"]}><Harness /></MemoryRouter>);
+  fireEvent.change(screen.getByRole("textbox", { name: "Name" }), { target: { value: "Ana" } });
+  const english = screen.getByRole("button", { name: "English" });
+  expect(english.querySelector("svg")).not.toBeNull();
+  expect(screen.getByRole("button", { name: "Español" })).toHaveAttribute("aria-pressed", "true");
+  fireEvent.click(english);
+  await waitFor(() => expect(screen.getByText("/en/register?source=demo")).toBeInTheDocument());
+  expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Ana");
+  expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true");
+});

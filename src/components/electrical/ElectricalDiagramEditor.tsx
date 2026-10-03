@@ -1,3 +1,4 @@
+import { Select } from "@pacific-code-labs/sokol-design-system";
 /**
  * ElectricalDiagramEditor — interactive single-line diagram (FCR-102).
  *
@@ -316,12 +317,12 @@ function EditorInner({ value, onChange }: Props) {
             </label>
             <label className="block space-y-1 text-[11px] text-muted-foreground">
               {tr.elec_node_phase}
-              <select
+              <Select
                 value={selectedNode.data.phase ?? ""}
                 onChange={(e) =>
                   patchSelected({ phase: (e.target.value || undefined) as TopologyPhase | undefined })
                 }
-                className="h-8 w-full rounded-md border border-input bg-background px-2 text-xs"
+                className="h-8 w-full rounded-md border border-input bg-background pl-2 pr-10 text-xs"
               >
                 <option value="">—</option>
                 {PHASES.map((p) => (
@@ -329,7 +330,7 @@ function EditorInner({ value, onChange }: Props) {
                     {p}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="block space-y-1 text-[11px] text-muted-foreground">
               {tr.elec_node_note}

@@ -23,13 +23,12 @@ export const usernameSchema = z
   .min(3, "val_username_min")
   .regex(/^[a-zA-Z0-9_-]+$/, "val_username_pattern");
 
-/** Register step 1: identity + locale. */
+/** Register step 1: identity. Locale comes from the navigation toggle. */
 export const registerInfoSchema = z.object({
   firstName: z.string().min(1, "val_first_name_required"),
   lastName: z.string().min(1, "val_last_name_required"),
   username: usernameSchema,
   email: emailSchema,
-  locale: z.enum(["es", "en"]),
 });
 
 /** Register step 2: password + confirmation. */

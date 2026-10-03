@@ -227,7 +227,10 @@
       "demo_limit_cta_fallback": "Sign up free",
       "quota_projects_fallback": "You've reached your plan's saved-projects limit. Upgrade to save more.",
       "quota_evaluate_fallback": "You've reached your plan's monthly evaluation limit. Upgrade to keep evaluating.",
-      "upgrade_tier_current": "current"
+      "upgrade_tier_current": "current",
+      "lang_toggle_label": "Language",
+      "lang_toggle_spanish": "Español",
+      "lang_toggle_english": "English"
     },
     "demo": {
       "demoWelcomeTitle": "Your fire-protection engineer, instantly.",

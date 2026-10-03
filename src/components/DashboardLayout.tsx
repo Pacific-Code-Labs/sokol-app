@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, LayoutDashboard, FolderKanban, Sparkles, LogOut, Languages, User, ShieldCheck, LifeBuoy } from "lucide-react";
+import { ChevronDown, LayoutDashboard, FolderKanban, Sparkles, LogOut, User, ShieldCheck, LifeBuoy } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,9 +24,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import { usePermissions } from "@/hooks/useRbac";
 import { useRealtimeEvents } from "@/hooks/useRealtimeEvents";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalAssistant } from "@/components/GlobalAssistant";
-import { localizedPath, runLangSwitch, stripLangPrefix } from "@/lib/paths";
+import { localizedPath, stripLangPrefix } from "@/lib/paths";
 
 /** Sidebar nav identifiers (one per item). */
 type NavId = "dashboard" | "projects" | "evaluator" | "electrical" | "roles" | "support";
@@ -224,7 +225,6 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
   // Title + active route are computed off the path WITHOUT its /:lang prefix.
   const rest = stripLangPrefix(location.pathname).rest;
-  const nextLang = lang === "es" ? "en" : "es";
 
   const titleMap: Record<string, string> = {
     "/dashboard": tr.nav_dashboard,
@@ -241,7 +241,6 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
   // Language toggle navigates to the same page under the other lang prefix
   // (wrapped in the lang animation); LangLayout's effect then syncs the context.
-  const switchLang = () => runLangSwitch(navigate, localizedPath(nextLang, rest));
 
   // Scroll the main content back to the top on every route change.
   useEffect(() => {
@@ -260,15 +259,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={switchLang}
-                className="gap-2"
-              >
-                <Languages className="h-4 w-4" />
-                {nextLang.toUpperCase()}
-              </Button>
+              <LanguageToggle />
             </div>
           </header>
           <main ref={mainRef} className="flex-1 overflow-auto">

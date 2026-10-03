@@ -1,14 +1,15 @@
-import { Languages, Home, LayoutDashboard, LogIn, LogOut, Menu } from "lucide-react";
+import { Home, LayoutDashboard, LogIn, LogOut, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BrandLogo, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@pacific-code-labs/sokol-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { tChrome } from "@/lib/chrome-i18n";
 import { getBrandingVM } from "@/services/branding.service";
-import { localizedPath, runLangSwitch, stripLangPrefix } from "@/lib/paths";
+import { localizedPath, stripLangPrefix } from "@/lib/paths";
 import { landingHref } from "@/lib/site-links";
 
 interface HeaderProps {
@@ -24,16 +25,9 @@ export function Header({ chatButton }: HeaderProps) {
 
   const chrome = tChrome(lang);
   const brand = getBrandingVM(lang);
-  const nextLang = lang === "es" ? "en" : "es";
 
   const closeMobile = () => setMobileOpen(false);
 
-  // Language toggle navigates to the same page under the other lang prefix
-  // (wrapped in the lang animation). LangLayout's effect then syncs the context.
-  const switchLang = () => {
-    const { rest } = stripLangPrefix(pathname);
-    runLangSwitch(navigate, localizedPath(nextLang, rest));
-  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 no-print">
@@ -81,15 +75,7 @@ export function Header({ chatButton }: HeaderProps) {
             </Button>
           )}
           <ThemeToggle />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={switchLang}
-            className="gap-2"
-          >
-            <Languages className="h-4 w-4" />
-            {chrome.nav.langSwitchTo}
-          </Button>
+          <LanguageToggle />
 
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

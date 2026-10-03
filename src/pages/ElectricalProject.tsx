@@ -1,3 +1,4 @@
+import { Select } from "@pacific-code-labs/sokol-design-system";
 /**
  * ElectricalProject — signed-in preliminary electrical-load workspace (FCR-102/105).
  *
@@ -168,17 +169,17 @@ export default function ElectricalProject() {
         {/* Structured inputs — the deterministic calc drivers */}
         <div className="grid gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <Field label={tr.elec_occupancy}>
-            <select
+            <Select
               value={inputs.occupancy}
               onChange={(e) => patch({ occupancy: e.target.value as ElectricalInputs["occupancy"] })}
-              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+              className="h-9 w-full rounded-md border border-input bg-background pl-2 pr-10 text-sm"
             >
               {OCCUPANCIES.map((o) => (
                 <option key={o} value={o}>
                   {tr[`elec_occ_${o}` as keyof typeof tr] as string}
                 </option>
               ))}
-            </select>
+            </Select>
           </Field>
           <Field label={`${tr.elec_area} (m²)`}>
             <Input
@@ -189,17 +190,17 @@ export default function ElectricalProject() {
             />
           </Field>
           <Field label={tr.elec_service_type}>
-            <select
+            <Select
               value={inputs.service}
               onChange={(e) => patch({ service: e.target.value as ElectricalInputs["service"] })}
-              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+              className="h-9 w-full rounded-md border border-input bg-background pl-2 pr-10 text-sm"
             >
               {SERVICES.map((s) => (
                 <option key={s} value={s}>
                   {tr[`elec_svc_${s}` as keyof typeof tr] as string}
                 </option>
               ))}
-            </select>
+            </Select>
           </Field>
           <Field label={`${tr.elec_growth} (%)`}>
             <Input

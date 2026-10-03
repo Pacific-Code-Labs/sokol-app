@@ -1,3 +1,4 @@
+import { Select } from "@pacific-code-labs/sokol-design-system";
 import { useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -82,13 +83,13 @@ export default function SupportNew() {
           )}
           <label className="block space-y-1">
             <span className={labelCls}>{tr.support_category}</span>
-            <select className={fieldCls} value={category} onChange={(e) => setCategory(e.target.value)}>
+            <Select className={fieldCls} value={category} onChange={(e) => setCategory(e.target.value)}>
               {content.categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {pickLang(c.label, lang)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="block space-y-1">
             <span className={labelCls}>{tr.support_subject}</span>

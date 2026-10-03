@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
-import { Button, FormField, Input, Select } from "@pacific-code-labs/sokol-design-system";
+import { Button, FormField, Input } from "@pacific-code-labs/sokol-design-system";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -35,7 +35,7 @@ export default function Register() {
 
   const infoForm = useForm<RegisterInfoForm>({
     resolver: zodResolver(registerInfoSchema),
-    defaultValues: { firstName: "", lastName: "", username: "", email: "", locale: lang },
+    defaultValues: { firstName: "", lastName: "", username: "", email: "" },
   });
 
   const pwForm = useForm<RegisterPasswordForm>({
@@ -72,7 +72,7 @@ export default function Register() {
         lastName: infoData.lastName,
         preferredUsername: infoData.username,
         email: infoData.email.trim(),
-        locale: infoData.locale,
+        locale: lang,
       });
 
       if (needsConfirmation) {
@@ -146,19 +146,7 @@ export default function Register() {
                 render={({ field }) => <Input placeholder={tr.auth_register_username_ph} {...field} />}
               />
             </FormField>
-            <FormField label={tr.auth_register_locale} error={tErr(infoForm.formState.errors.locale?.message)}>
-              <Controller
-                control={infoForm.control}
-                name="locale"
-                render={({ field }) => (
-                  <Select {...field}>
-                    <option value="es">{tr.auth_register_locale_es}</option>
-                    <option value="en">{tr.auth_register_locale_en}</option>
-                  </Select>
-                )}
-              />
-            </FormField>
-          </div>
+            </div>
 
           <Button type="submit" variant="primary" className="w-full mt-1">
             {tr.auth_register_continue}
