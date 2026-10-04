@@ -11,7 +11,7 @@ import { Select } from "@pacific-code-labs/sokol-design-system";
  * study can be saved as an `electrical` project.
  */
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useLocation, Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Save, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,8 @@ function toBuildingType(occupancy: string): ProjectBuildingType {
 export default function ElectricalProject() {
   const { lang, tr } = useLang();
   const navigate = useNavigate();
+  const location = useLocation();
+  const incoming = location.state as { assistantElectrical?: ElectricalLoadData; assistantRequest?: { area_m2?: number; floors?: number } } | null;
   const { setPageContext, setInput } = useAssistant();
   // FCR-118: edit round-trip — `?projectId=<id>` loads a saved study to edit in
   // place (PUT) instead of creating a new project on save.
@@ -71,7 +73,7 @@ export default function ElectricalProject() {
   // One initial compute to seed the editor's topology before it mounts. In edit
   // mode (?projectId) the seed comes from the saved snapshot instead (below).
   useEffect(() => {
-    if (editId) return;
+    if (editId || incoming?.assistantElectrical) return;
     let alive = true;
     sokolApi
       .postElectricalPreliminary({ inputs })
@@ -86,7 +88,7 @@ export default function ElectricalProject() {
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [location.state]);
 
   // FCR-118: edit mode — once the project resolves, seed inputs + topology +
   // result from its saved electrical snapshot (or fall back to a fresh compute
@@ -123,8 +125,8 @@ export default function ElectricalProject() {
 
   useEffect(() => {
     setPageContext(editProject ? { page: "project_detail", payload: { project: editProject } } : { page: "other" });
-    setInput({ areaM2: inputs.area_m2, floors: inputs.floors });
-  }, [editProject, inputs.area_m2, inputs.floors, setPageContext, setInput]);
+    setInput(incoming?.assistantElectrical && !editId ? { areaM2: incoming.assistantRequest?.area_m2, floors: incoming.assistantRequest?.floors } : { areaM2: inputs.area_m2, floors: inputs.floors });
+  }, [editProject, inputs.area_m2, inputs.floors, location.state, editId, setPageContext, setInput]);
 
   const editorValue = useMemo(
     () => ({ inputs, topology: seed?.topology ?? EMPTY_TOPOLOGY }),
@@ -167,6 +169,14 @@ export default function ElectricalProject() {
       setSaving(false);
     }
   };
+
+  if (incoming?.assistantElectrical && !editId) return (
+    <section className="space-y-4">
+      <h2 className="text-xl font-semibold">{tr.tour_diagram_title}</h2>
+      <ElectricalLoadCard data={incoming.assistantElectrical} />
+      <Button variant="outline" onClick={() => navigate(localizedPath(lang, "/projects/electrical"), { state: null })}>{tr.assistant_edit_electrical}</Button>
+    </section>
+  );
 
   return (
     <>

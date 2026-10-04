@@ -78,14 +78,23 @@ export function AppTutorial({ userId, ready, projects, evaluator, dashboard }: P
       </DialogContent>
     </Dialog>
     {progress.status === "active" && ready && createPortal(
-      <section aria-label={tr.tour_replay} className="fixed bottom-24 sm:bottom-5 left-4 right-4 z-40 rounded-xl border border-primary/30 bg-card p-5 shadow-xl sm:left-6 sm:right-auto sm:w-[380px] lg:left-[260px]">
+      <section aria-label={tr.tour_replay} className="fixed bottom-24 sm:bottom-5 left-4 right-4 z-40 max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-xl border border-primary/30 bg-card p-5 shadow-xl sm:left-6 sm:right-auto sm:w-[380px] lg:left-[260px]">
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-medium text-primary">{tr.tour_step.replace("{current}", String(index + 1)).replace("{total}", String(steps.length))}</span>
           <Button variant="ghost" size="icon" aria-label={tr.tour_close} onClick={dismiss}><X className="h-4 w-4" /></Button>
         </div>
         <div role="progressbar" aria-label={tr.tour_progress} aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={index + 1} className="mb-4 h-1 rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${((index + 1) / steps.length) * 100}%` }} /></div>
-        <div aria-live="polite"><h2 className="font-semibold">{step.title}</h2><p className="mt-2 text-sm text-muted-foreground">{step.description}</p></div>
+        <div aria-live="polite"><h2 className="font-semibold">{step.title}</h2><p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
+          {["projects", "evaluator", "diagram", "assistant"].includes(step.id) && (
+            <div className="mt-3 space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
+              <p className="font-medium">{tr.tour_try_saying}</p>
+              <p>{tr[`tour_${step.id}_example`]}</p>
+              <p className="text-xs text-muted-foreground">{tr[`tour_${step.id}_outcome`]}</p>
+            </div>
+          )}
+        </div>
         {!atStep && <Button variant="link" className="mt-2 px-0" onClick={() => go(index)}>{tr.tour_visit}</Button>}
+        <Button variant="link" className="mt-2 h-auto whitespace-normal px-0 text-left" onClick={() => { dismiss(); navigate(localizedPath(lang, "/assistant-guide")); }}>{tr.guide_title}</Button>
         <div className="mt-4 flex justify-between gap-2">
           <Button variant="outline" disabled={index === 0} onClick={() => go(index - 1)}><ChevronLeft className="mr-1 h-4 w-4" />{tr.tour_previous}</Button>
           <Button onClick={() => index === steps.length - 1 ? save({ ...progress, status: "complete" }) : go(index + 1)}>{index === steps.length - 1 ? tr.tour_finish : tr.tour_next}<ChevronRight className="ml-1 h-4 w-4" /></Button>

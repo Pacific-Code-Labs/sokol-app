@@ -58,3 +58,13 @@ it("does not interrupt a deep link or begin before permissions load", () => {
   render(tour({ready:false}));
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
+
+it("teaches assistant requests and their outcomes in each work section", () => {
+  render(tour());
+  fireEvent.click(screen.getByRole("button", { name: t.es.tour_start }));
+  for (const section of ["projects", "evaluator", "diagram", "assistant"]) {
+    fireEvent.click(screen.getByRole("button", { name: t.es.tour_next }));
+    expect(screen.getByText(t.es[`tour_${section}_example`])).toBeInTheDocument();
+    expect(screen.getByText(t.es[`tour_${section}_outcome`])).toBeInTheDocument();
+  }
+});

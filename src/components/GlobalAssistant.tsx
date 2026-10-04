@@ -1,10 +1,9 @@
 import { createPortal } from "react-dom";
-import { Sparkles } from "lucide-react";
+import { AssistantAvatar } from "@/components/assistant/AssistantAvatar";
 import { ChatPanel } from "@/components/ChatPanel";
 import { AssistantDrawer } from "@/components/assistant/AssistantDrawer";
 import { useAssistant } from "@/contexts/AssistantContext";
 import { useLang } from "@/contexts/LangContext";
-import { BuildingType } from "@/services/sokolApi";
 
 /**
  * Dashboard floating launcher + assistant drawer (FCR-113).
@@ -24,10 +23,9 @@ export function GlobalAssistant() {
           <button
             onClick={() => setOpen(true)}
             aria-label={tr.assistant}
-            className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-105 hover:shadow-xl"
+            className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <Sparkles className="h-4 w-4" />
-            <span className="hidden text-sm font-semibold sm:inline">{tr.assistant}</span>
+            <AssistantAvatar className="h-10 w-10 brightness-0 invert" />
           </button>,
           document.body,
         )
@@ -38,7 +36,7 @@ export function GlobalAssistant() {
       {fab}
       <AssistantDrawer open={open} onOpenChange={setOpen} title={tr.assistant}>
         <ChatPanel
-          buildingType={input.buildingType ?? BuildingType.comercial}
+          buildingType={input.buildingType}
           usage={input.usage ?? ""}
           areaM2={input.areaM2}
           floors={input.floors}

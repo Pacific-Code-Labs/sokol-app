@@ -51,12 +51,12 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/30">
+          <Card className="flex flex-col border-primary/30">
             <CardHeader>
               <CardTitle className="text-sm font-medium">{tr.new_evaluation}</CardTitle>
               <CardDescription>{tr.run_evaluator}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="mt-auto">
               <Button asChild className="w-full gap-2">
                 <Link to={localizedPath(lang, "/dashboard/evaluator")}>
                   <Sparkles className="h-4 w-4" />
@@ -66,12 +66,12 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="flex flex-col">
             <CardHeader>
               <CardTitle className="text-sm font-medium">{tr.create_project}</CardTitle>
               <CardDescription>{tr.save_building_data}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="mt-auto">
               <Button asChild variant="outline" className="w-full gap-2">
                 <Link to={localizedPath(lang, "/projects/new")}>
                   <Plus className="h-4 w-4" />

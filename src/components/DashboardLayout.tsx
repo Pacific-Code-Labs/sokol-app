@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
-import { LayoutDashboard, FolderKanban, Sparkles, LogOut, User, ShieldCheck, LifeBuoy, Menu } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Sparkles, LogOut, User, ShieldCheck, LifeBuoy, Menu, BookOpen } from "lucide-react";
 import { AppShell, BrandLogo, type NavGroup, type NavItem } from "@pacific-code-labs/sokol-design-system";
 import { getBrandingVM } from "@/services/branding.service";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,10 +32,10 @@ export function DashboardLayout() {
   const topItems = visible("panel", "overview") ? [item("/dashboard", tr.nav_dashboard, LayoutDashboard, true)] : [];
   const groups: NavGroup[] = [
     { key: "workspace", label: tr.nav_workspace, icon: FolderKanban, items: visible("projects", "projects") ? [item("/projects", tr.nav_projects, FolderKanban)] : [] },
-    { key: "tools", label: tr.nav_tools, icon: Sparkles, items: [...(visible("projects", "evaluator") ? [item("/dashboard/evaluator", tr.nav_evaluator, Sparkles)] : []), item("/support", tr.nav_support, LifeBuoy)] },
+    { key: "tools", label: tr.nav_tools, icon: Sparkles, items: [...(visible("projects", "evaluator") ? [item("/dashboard/evaluator", tr.nav_evaluator, Sparkles)] : []), item("/assistant-guide", tr.guide_title, BookOpen), item("/support", tr.nav_support, LifeBuoy)] },
     { key: "admin", label: tr.nav_admin, icon: ShieldCheck, items: tier === "enterprise" && permissions.isReady && (permissions.isAdmin || permissions.isOwner) ? [item("/dashboard/roles", tr.nav_roles, ShieldCheck)] : [] },
   ].filter((group) => group.items.length > 0);
-  const titleMap: Record<string, string> = { "/dashboard": tr.nav_dashboard, "/dashboard/evaluator": tr.nav_evaluator, "/dashboard/roles": tr.nav_roles, "/dashboard/profile": tr.nav_profile, "/projects": tr.nav_projects, "/projects/new": tr.new_project, "/support": tr.nav_support, "/pricing": tr.pricing_title };
+  const titleMap: Record<string, string> = { "/assistant-guide": tr.guide_title, "/dashboard": tr.nav_dashboard, "/dashboard/evaluator": tr.nav_evaluator, "/dashboard/roles": tr.nav_roles, "/dashboard/profile": tr.nav_profile, "/projects": tr.nav_projects, "/projects/new": tr.new_project, "/support": tr.nav_support, "/pricing": tr.pricing_title };
   const title = titleMap[rest] ?? (rest.startsWith("/projects/") ? tr.nav_projects : rest.startsWith("/support") ? tr.nav_support : tr.nav_dashboard);
   const name = displayName(profile, user);
   useEffect(() => {

@@ -36,6 +36,8 @@ import { getAssistantCapabilities } from "@/lib/assistantCapabilities";
 import { cn } from "@/lib/utils";
 import { errorReference } from "@/lib/error-reference";
 import { ReportProblemLink } from "@/components/ReportProblemLink";
+import { assistantDestination } from "@/lib/assistantNavigation";
+import type { EvaluateRequest } from "@/services/sokolApi";
 
 /** Read the HTTP status off an Amplify/fetch error, tolerating shapes. */
 function readErrorStatus(err: unknown): number | undefined {
@@ -78,7 +80,7 @@ export interface Msg {
 }
 
 interface Props {
-  buildingType: BuildingType;
+  buildingType?: BuildingType;
   usage: string;
   areaM2?: number;
   floors?: number;
@@ -193,7 +195,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   }, [messages, isLoading]);
 
   /** Render the agent response and return its normalized type (for guided flow). */
-  const handleResponse = async (raw: unknown): Promise<AssistantResponseType> => {
+  const handleResponse = async (raw: unknown, request: EvaluateRequest): Promise<AssistantResponseType> => {
     const norm = normalizeAssistantResponse(raw);
 
     switch (norm.type) {
@@ -241,7 +243,10 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
             payload: norm.data,
           },
         ]);
-        if (!isPreview) toast.success(tr.chat_project_created_toast);
+        if (!isPreview) {
+          await queryClient.invalidateQueries({ queryKey: ["projects"] });
+          toast.success(tr.chat_project_created_toast);
+        }
         break;
       }
       case "needs_info": {
@@ -266,6 +271,13 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
           { role: "assistant", text: summary, type: "electrical", payload: norm.data },
         ]);
         break;
+      }
+    }
+    if (!demo) {
+      const destination = assistantDestination(norm, request);
+      if (destination) {
+        navigate(localizedPath(lang, destination.path), { state: destination.state });
+        onClose?.();
       }
     }
     return norm.type;
@@ -395,7 +407,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       const result = caps.throttledDemoEndpoint
         ? await sokolApi.evaluateDemo(requestBody)
         : await sokolApi.evaluate(requestBody);
-      const type = await handleResponse(result);
+      const type = await handleResponse(result, requestBody);
       // Guided demo: advance to the next prompt. On needs_info the form drives
       // the resend (which carries demoNext forward), so don't prompt yet.
       if (caps.guidedFlow && !demoEndedRef.current && type !== "needs_info" && demoNextRef.current) {

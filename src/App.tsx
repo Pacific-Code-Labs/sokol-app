@@ -30,6 +30,7 @@ import { LangLayout } from "@/components/LangLayout";
 import { DEFAULT_LANG, isLang, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
 import { landingHref } from "@/lib/site-links";
 import Evaluator from "./pages/Evaluator.tsx";
+import AssistantGuide from "./pages/AssistantGuide.tsx";
 import SupportList from "./pages/SupportList.tsx";
 import SupportNew from "./pages/SupportNew.tsx";
 import SupportDetail from "./pages/SupportDetail.tsx";
@@ -91,6 +92,7 @@ const App = () => (
                   <Route element={<ProductLayout />}>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="dashboard/evaluator" element={<Evaluator />} />
+                  <Route path="assistant-guide" element={<AssistantGuide />} />
                   <Route path="dashboard/profile" element={<ProfilePage />} />
                   <Route path="dashboard/roles" element={<RolesPage />} />
                   <Route path="organizations/new" element={<NewOrganization />} />
