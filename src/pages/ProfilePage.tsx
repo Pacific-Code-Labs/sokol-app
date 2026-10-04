@@ -138,7 +138,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardBody>
               {!isEditing ? (
-                <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Field label={tr.profile_first_name} value={profile?.firstName || placeholder} />
                   <Field label={tr.profile_last_name} value={profile?.lastName || placeholder} />
                   <Field label={tr.profile_email} value={profile?.email || placeholder} />
@@ -155,14 +155,15 @@ export default function ProfilePage() {
                     </FormField>
                   </div>
 
-                  <FormField label={tr.profile_username} required error={tErr(profileForm.formState.errors.username?.message)}>
-                    <Controller control={profileForm.control} name="username" render={({ field }) => <Input {...field} />} />
-                  </FormField>
-
-                  {/* Email is the Cognito sign-in identity — read-only, never sent. */}
-                  <FormField label={tr.profile_email} hint={tr.profile_email_readonly}>
-                    <Input value={profile?.email ?? ""} readOnly disabled />
-                  </FormField>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Email is the Cognito sign-in identity — read-only, never sent. */}
+                    <FormField className="min-w-0" label={tr.profile_email} hint={tr.profile_email_readonly}>
+                      <Input value={profile?.email ?? ""} readOnly disabled />
+                    </FormField>
+                    <FormField className="min-w-0" label={tr.profile_username} required error={tErr(profileForm.formState.errors.username?.message)}>
+                      <Controller control={profileForm.control} name="username" render={({ field }) => <Input {...field} />} />
+                    </FormField>
+                  </div>
 
                   <div className="flex gap-3 pt-1">
                     <Button type="submit" variant="primary" className="flex-1" disabled={savingProfile}>
@@ -265,9 +266,9 @@ export default function ProfilePage() {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div className="min-w-0">
       <div className="t-label">{label}</div>
-      <p className="text-sm font-medium text-foreground">{value}</p>
+      <p className="text-sm font-medium text-foreground [overflow-wrap:anywhere]">{value}</p>
     </div>
   );
 }
