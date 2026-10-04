@@ -193,7 +193,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   }, [messages, isLoading]);
 
   /** Render the agent response and return its normalized type (for guided flow). */
-  const handleResponse = (raw: unknown): AssistantResponseType => {
+  const handleResponse = async (raw: unknown): Promise<AssistantResponseType> => {
     const norm = normalizeAssistantResponse(raw);
 
     switch (norm.type) {
@@ -257,7 +257,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         break;
       }
       case "electrical_load": {
-        if (norm.data.projectId) void queryClient.invalidateQueries({ queryKey: ["projects"] });
+        if (norm.data.projectId) await queryClient.invalidateQueries({ queryKey: ["projects"] });
         const summary = fmt(tr.chat_load_study, {
           kva: norm.data.demandKva?.toLocaleString?.() ?? norm.data.demandKva,
         });
@@ -395,7 +395,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       const result = caps.throttledDemoEndpoint
         ? await sokolApi.evaluateDemo(requestBody)
         : await sokolApi.evaluate(requestBody);
-      const type = handleResponse(result);
+      const type = await handleResponse(result);
       // Guided demo: advance to the next prompt. On needs_info the form drives
       // the resend (which carries demoNext forward), so don't prompt yet.
       if (caps.guidedFlow && !demoEndedRef.current && type !== "needs_info" && demoNextRef.current) {

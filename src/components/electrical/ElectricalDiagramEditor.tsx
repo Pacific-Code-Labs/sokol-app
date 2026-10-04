@@ -81,6 +81,16 @@ function EditorInner({ value, onChange }: Props) {
   const [exporting, setExporting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
+  const requestVersionRef = useRef(0);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      requestVersionRef.current += 1;
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
   // Keep stable refs so the debounced recalc always reads current graph state.
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
@@ -117,12 +127,14 @@ function EditorInner({ value, onChange }: Props) {
       ...base,
       special_loads: { ...(base.special_loads ?? {}), other: [...mappedOther, ...customOther] },
     };
+    const version = ++requestVersionRef.current;
+    const current = () => mountedRef.current && requestVersionRef.current === version;
     setIsCalculating(true);
     sokolApi
       .postElectricalPreliminary({ inputs, topology })
-      .then((result) => onChangeRef.current({ inputs, topology, result }))
-      .catch((error) => onChangeRef.current({ inputs, topology, error }))
-      .finally(() => setIsCalculating(false));
+      .then((result) => { if (current()) onChangeRef.current({ inputs, topology, result }); })
+      .catch((error) => { if (current()) onChangeRef.current({ inputs, topology, error }); })
+      .finally(() => { if (current()) setIsCalculating(false); });
   }, [mappedOther]);
 
   /** Schedule a debounced recalculation after any graph mutation. */

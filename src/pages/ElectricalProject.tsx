@@ -10,7 +10,7 @@ import { Select } from "@pacific-code-labs/sokol-design-system";
  * kVA, transformer, phase balance, mandated provisions) render live and the
  * study can be saved as an `electrical` project.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Save, Zap } from "lucide-react";
@@ -51,7 +51,8 @@ export default function ElectricalProject() {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("projectId") ?? undefined;
   const { project: editProject } = useProject(editId ?? "");
-  const [seeded, setSeeded] = useState(false);
+  const sourceSnapshotRef = useRef<string | null>(null);
+  const [editorRevision, setEditorRevision] = useState(0);
 
   const [inputs, setInputs] = useState<ElectricalInputs>({
     occupancy: "residencial",
@@ -91,8 +92,13 @@ export default function ElectricalProject() {
   // result from its saved electrical snapshot (or fall back to a fresh compute
   // if the id has no study, e.g. a stray link).
   useEffect(() => {
-    if (!editId || seeded || editProject === undefined) return;
-    setSeeded(true);
+    if (!editId || editProject === undefined) return;
+    // Query invalidation after an assistant save supplies a new snapshot.
+    // Only backend snapshot changes reset the editor; local edits and language
+    // changes keep the current graph and form state.
+    const sourceKey = JSON.stringify({ id: editId, electrical: editProject?.electrical ?? null });
+    if (sourceSnapshotRef.current === sourceKey) return;
+    sourceSnapshotRef.current = sourceKey;
     const snap = editProject?.electrical;
     if (snap?.result) {
       setInputs({ ...snap.inputs, language: lang });
@@ -101,6 +107,7 @@ export default function ElectricalProject() {
       setSeed({ ...snap.result, topology });
       setResult(snap.result);
       setSnapshotTopology(topology);
+      setEditorRevision(revision => revision + 1);
     } else {
       sokolApi
         .postElectricalPreliminary({ inputs })
@@ -112,7 +119,7 @@ export default function ElectricalProject() {
         .catch(() => setSeed({ topology: EMPTY_TOPOLOGY } as ElectricalLoadData));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editId, seeded, editProject, lang]);
+  }, [editId, editProject, lang]);
 
   useEffect(() => {
     setPageContext(editProject ? { page: "project_detail", payload: { project: editProject } } : { page: "other" });
@@ -248,6 +255,7 @@ export default function ElectricalProject() {
           <div className="mb-2 text-sm font-semibold">{tr.elec_single_line}</div>
           {seed ? (
             <ElectricalDiagramEditor
+              key={`${editId ?? "new"}:${editorRevision}`}
               value={editorValue}
               onChange={({ topology, inputs: updatedInputs, result: r }) => {
                 setInputs(updatedInputs);
