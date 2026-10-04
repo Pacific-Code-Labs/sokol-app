@@ -34,7 +34,7 @@
 .premium-workspace .workspace-table { border-radius: 1rem; border-color: var(--workspace-line); box-shadow: var(--workspace-shadow); }
 .premium-workspace .workspace-table th { font-size: .68rem; letter-spacing: .025em; padding-block: 1rem; background: hsl(var(--foreground) / .025); }
 .premium-workspace .workspace-table td { padding-block: 1rem; }
-:is(.premium-workspace, .premium-demo, .premium-auth, .premium-assistant) :is(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
+:is(.premium-workspace, .premium-demo, .premium-auth, .premium-assistant) :is(input:not([type="checkbox"]):not([type="radio"]):not([inputmode="numeric"][maxlength="1"]), textarea, select) {
   border-radius: .65rem;
   border-color: hsl(var(--foreground) / .13);
   background-color: hsl(var(--background) / .8);
@@ -70,3 +70,8 @@
   .premium-demo, .premium-workspace #page-content { background: white; }
   .premium-demo .panel, .premium-workspace .workspace-card { box-shadow: none; }
 }
+
+/* Keep segmented verification controls distinct from full-width form fields. */
+.premium-auth [role="group"]:has(> input[inputmode="numeric"][maxlength="1"]) { justify-content: center; gap: clamp(.3rem, 1.5vw, .5rem); }
+.premium-auth input[inputmode="numeric"][maxlength="1"] { width: clamp(1.75rem, 8vw, 2.75rem); height: auto; aspect-ratio: 1; border-radius: .3rem; flex-shrink: 0; }
+.premium-auth .auth-brand { display: flex; width: 100%; justify-content: center; }

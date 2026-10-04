@@ -39,7 +39,7 @@ export function AuthShell({
       </div>
       <div className="w-full max-w-md">
         {/* Brand lockup only (not a link): "back" on each screen leads to the landing. */}
-        <div className="flex items-center gap-3 justify-center mb-6">
+        <div className="auth-brand flex items-center gap-3 justify-center mb-6">
           <BrandLogo
             name={brand.companyName}
             suffix={brand.companySuffix}
