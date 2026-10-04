@@ -440,7 +440,10 @@
       "profile_tokens_budget": "Monthly token budget",
       "profile_usage_resets": "Resets on {date} (UTC).",
       "profile_usage_unavailable": "Usage could not be loaded. Please try again.",
-      "profile_usage_refresh": "Refresh usage"
+      "profile_usage_refresh": "Refresh usage",
+      "profile_weekly_quota": "Quota every 8 days",
+      "profile_monthly_quota": "Monthly quota",
+      "profile_tokens_allowance": "Token allowance"
     },
     "roles": {
       "roles_title": "Roles & permissions",
