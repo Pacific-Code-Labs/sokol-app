@@ -2,7 +2,7 @@ import { useAssistantRuntimeRef, useAssistantChatState } from "@/contexts/Assist
 import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Send, Sparkles, Loader2, Trash2, X } from "lucide-react";
+import { Send, Sparkles, Loader2, Trash2, X, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,8 @@ import { getAssistantCapabilities } from "@/lib/assistantCapabilities";
 import { cn } from "@/lib/utils";
 import { errorReference } from "@/lib/error-reference";
 import { ReportProblemLink } from "@/components/ReportProblemLink";
-import { assistantDestination } from "@/lib/assistantNavigation";
+import { assistantDestination, type AssistantDestination, type EvaluationProjectDraft } from "@/lib/assistantNavigation";
+import { evaluatorRequest } from "@/lib/evaluatorRequest";
 import type { EvaluateRequest } from "@/services/sokolApi";
 
 /** Read the HTTP status off an Amplify/fetch error, tolerating shapes. */
@@ -77,6 +78,9 @@ export interface Msg {
   submitLabel?: string;
   /** Server-error reference (X-Request-Id) for "Report this problem". */
   reference?: string;
+  /** Retained with this result so earlier responses open their own scenario. */
+  destination?: AssistantDestination;
+  projectDraft?: EvaluationProjectDraft;
 }
 
 interface Props {
@@ -197,6 +201,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   /** Render the agent response and return its normalized type (for guided flow). */
   const handleResponse = async (raw: unknown, request: EvaluateRequest): Promise<AssistantResponseType> => {
     const norm = normalizeAssistantResponse(raw);
+    const destination = demo ? undefined : assistantDestination(norm, request) ?? undefined;
 
     switch (norm.type) {
       case "evaluation": {
@@ -217,7 +222,8 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
 
         setMessages((m) => [
           ...m,
-          { role: "assistant", text: summary, type: "evaluation", payload: data, answer: data },
+          { role: "assistant", text: summary, type: "evaluation", payload: data, answer: data, destination,
+            projectDraft: demo ? undefined : { request: evaluatorRequest(request), evaluation: data } },
         ]);
         break;
       }
@@ -241,6 +247,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
             text: fmt(isPreview ? tr.chat_project_preview_msg : tr.chat_project_created_msg, { name }),
             type: "project",
             payload: norm.data,
+            destination,
           },
         ]);
         if (!isPreview) {
@@ -268,16 +275,9 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         });
         setMessages((m) => [
           ...m,
-          { role: "assistant", text: summary, type: "electrical", payload: norm.data },
+          { role: "assistant", text: summary, type: "electrical", payload: norm.data, destination },
         ]);
         break;
-      }
-    }
-    if (!demo) {
-      const destination = assistantDestination(norm, request);
-      if (destination) {
-        navigate(localizedPath(lang, destination.path), { state: destination.state });
-        onClose?.();
       }
     }
     return norm.type;
@@ -739,6 +739,18 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
                 )}
               >
                 {m.role === "user" ? <TextMessage text={m.text} /> : renderAssistantBody(m)}
+                {!demo && m.role === "assistant" && m.destination && (
+                  <Button variant="outline" size="sm" className="mt-3 h-auto max-w-full gap-2 whitespace-normal text-left" onClick={() => {
+                    navigate(localizedPath(lang, m.destination!.path), { state: m.destination!.state });
+                    onClose?.();
+                  }}>{tr[m.destination.label]}<ArrowRight className="h-4 w-4 shrink-0" /></Button>
+                )}
+                {!demo && m.role === "assistant" && m.projectDraft && (
+                  <Button variant="outline" size="sm" className="mt-3 h-auto max-w-full gap-2 whitespace-normal text-left" onClick={() => {
+                    navigate(localizedPath(lang, "/projects?new=1"), { state: { projectDraft: m.projectDraft } });
+                    onClose?.();
+                  }}>{tr.assistant_create_from_evaluation}<ArrowRight className="h-4 w-4 shrink-0" /></Button>
+                )}
                 {m.type === "error" && m.reference && <ReportProblemLink reference={m.reference} category="evaluation" />}
               </div>
             </div>

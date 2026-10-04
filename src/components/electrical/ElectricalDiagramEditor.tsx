@@ -28,9 +28,7 @@ import {
   type OnSelectionChangeParams,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { DiagramDownloadMenu, type DiagramFormat } from "./DiagramDownloadMenu";
-import { downloadDiagram } from "./downloadDiagram";
-import { toast } from "sonner";
+import { ElectricalDiagramModal } from "./ElectricalDiagramModal";
 import { Plus, Trash2, LayoutDashboard, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,14 +69,13 @@ const DEBOUNCE_MS = 500;
 
 function EditorInner({ value, onChange }: Props) {
   const { tr } = useLang();
-  const flowRef = useRef<HTMLDivElement>(null);
   const initial = useMemo(() => topologyToFlow(value.topology), [value.topology]);
   const [nodes, setNodes, onNodesChange] = useNodesState<ElectricalRFNode>(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initial.edges);
   const [newKind, setNewKind] = useState<TopologyNodeType>("load");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [exporting, setExporting] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
@@ -230,22 +227,10 @@ function EditorInner({ value, onChange }: Props) {
     setNodes((ns) => layoutNodes(ns, edgesRef.current));
   }, [setNodes]);
 
-  const exportImage = useCallback(
-    async (format: DiagramFormat) => {
-      if (!flowRef.current || nodesRef.current.length === 0) return;
-      setExporting(true);
-      try {
-        await downloadDiagram(flowRef.current, nodesRef.current, format, tr.elec_diagram_preliminary, { conductors: tr.elec_conductors, conduit: tr.elec_conduit, feederLength: tr.elec_feeder_length, protection: tr.elec_protection, interruptingRating: tr.elec_interrupting_rating, grounding: tr.elec_grounding, pending: tr.elec_pending_validation, title: tr.elec_single_line }, edgesRef.current);
-      } catch {
-        toast.error(tr.elec_export_error);
-      } finally { setExporting(false); }
-    },
-    [tr],
-  );
-
   return (
     <div className="flex h-full min-h-[420px] w-full flex-col gap-3 md:flex-row">
-      <div ref={flowRef} className="relative flex h-[560px] min-h-[420px] flex-1 flex-col overflow-hidden rounded-lg border border-border">
+      <ElectricalDiagramModal open={viewerOpen} onOpenChange={setViewerOpen} nodes={nodes} edges={edges} />
+      <div className="relative flex h-[560px] min-h-[420px] flex-1 flex-col overflow-hidden rounded-lg border border-border">
           <div className="relative z-10 flex flex-wrap gap-1.5 border-b border-border bg-card p-2">
             <Select aria-label={tr.elec_node_type} value={newKind} onChange={e => setNewKind(e.target.value as TopologyNodeType)} className="h-8 max-w-44">
               {(["load", "panel", "main_breaker", "spd", "grounding", "meter", "utility"] as const).map(kind => <option key={kind} value={kind}>{tr[`elec_kind_${kind}`]}</option>)}
@@ -265,7 +250,7 @@ function EditorInner({ value, onChange }: Props) {
             <Button type="button" size="sm" variant="secondary" onClick={relayout}>
               <LayoutDashboard className="mr-1 h-3.5 w-3.5" /> {tr.elec_auto_layout}
             </Button>
-            <DiagramDownloadMenu busy={exporting} disabled={!nodes.length} onDownload={exportImage} />
+            <Button type="button" variant="outline" size="sm" disabled={!nodes.length} onClick={() => setViewerOpen(true)}>{tr.diagram_open}</Button>
           </div>
         <div className="min-h-0 flex-1">
         <ReactFlow

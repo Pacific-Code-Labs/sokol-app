@@ -33,10 +33,15 @@ function mount(props = {}) {
   fireEvent.submit(screen.getByPlaceholderText(t.es.askPlaceholder).closest("form")!);
 }
 
-it("opens the evaluator with the request while preserving the answer in conversation", async () => {
+it("offers the evaluator without automatic navigation, preserving filters and the conversation", async () => {
   const close = vi.fn();
   api.evaluate.mockResolvedValue({ type: "evaluation", data: { matchedRules: [{ id: "rule-1", title: "NFPA 13" }], requirements: [], reference: [], contextCr: [], risk: "medio", foundryUsed: true } });
   mount({ close });
+  const open = await screen.findByRole("button", { name: t.es.assistant_open_evaluator });
+  expect(screen.getByTestId("destination").textContent).toBe("/es/projects");
+  expect(close).not.toHaveBeenCalled();
+  expect(screen.getByRole("button", { name: t.es.assistant_create_from_evaluation })).toBeInTheDocument();
+  fireEvent.click(open);
   await waitFor(() => expect(screen.getByTestId("destination")).toHaveTextContent("/es/dashboard/evaluator"));
   expect(screen.getByTestId("result")).not.toHaveTextContent("assistantEvaluation");
   expect(screen.getByTestId("result")).toHaveTextContent('"area_m2":350');
@@ -44,13 +49,32 @@ it("opens the evaluator with the request while preserving the answer in conversa
   expect(close).toHaveBeenCalledOnce();
 });
 
+it("offers project creation with the chosen evaluation and its known building details", async () => {
+  api.evaluate.mockResolvedValue({ type: "evaluation", data: { matchedRules: [], requirements: ["Sprinklers"], reference: ["NFPA 13"], contextCr: [], risk: "alto", foundryUsed: true } });
+  const close = vi.fn();
+  mount({ close });
+  fireEvent.click(await screen.findByRole("button", { name: t.es.assistant_create_from_evaluation }));
+  expect(screen.getByTestId("destination").textContent).toBe("/es/projects?new=1");
+  expect(screen.getByTestId("result")).toHaveTextContent('"projectDraft"');
+  expect(screen.getByTestId("result")).toHaveTextContent('"area_m2":350');
+  expect(screen.getByTestId("result")).toHaveTextContent("Sprinklers");
+  expect(close).toHaveBeenCalledOnce();
+});
+
 it.each([
-  [{ type: "project_created", data: { projectId: "new-project", project: { name: "Restaurante" } } }, "/es/projects/new-project"],
-  [{ type: "electrical_load", data: { projectId: "saved-project", demandKva: 12 } }, "/es/projects/electrical?projectId=saved-project"],
-])("opens the workspace for a completed result", async (response, path) => {
+  [{ type: "project_created", data: { projectId: "new-project", project: { name: "Restaurante" } } }, "/es/projects/new-project", "assistant_open_project"],
+  [{ type: "electrical_load", data: { projectId: "saved-project", demandKva: 12 } }, "/es/projects/electrical?projectId=saved-project", "assistant_open_electrical"],
+])("offers the workspace for a saved result and opens it only on click", async (response, path, label) => {
   api.evaluate.mockResolvedValue(response);
-  mount();
+  const close = vi.fn();
+  mount({ close });
+  const open = await screen.findByRole("button", { name: t.es[label] });
+  expect(screen.getByTestId("destination").textContent).toBe("/es/projects");
+  expect(close).not.toHaveBeenCalled();
+  fireEvent.click(open);
   await waitFor(() => expect(screen.getByTestId("destination").textContent).toBe(path));
+  expect(close).toHaveBeenCalledOnce();
+  expect(screen.getByTestId("result")).not.toHaveTextContent("assistantElectrical");
 });
 
 it("keeps clarification and conversational answers on the current page", async () => {
@@ -70,6 +94,7 @@ it("does not navigate the public demo into signed-in pages", async () => {
   await waitFor(() => expect(screen.getByPlaceholderText(t.es.askPlaceholder)).not.toBeDisabled());
   expect(screen.getByTestId("destination")).toHaveTextContent("/es/projects");
   expect(close).not.toHaveBeenCalled();
+  expect(screen.queryByRole("button", { name: t.es.assistant_open_evaluator })).not.toBeInTheDocument();
 });
 
 it("keeps an electrical result without a saved project in chat", async () => {
@@ -79,4 +104,26 @@ it("keeps an electrical result without a saved project in chat", async () => {
   await waitFor(() => expect(screen.getByPlaceholderText(t.es.askPlaceholder)).not.toBeDisabled());
   expect(screen.getByTestId("destination").textContent).toBe("/es/projects");
   expect(close).not.toHaveBeenCalled();
+});
+
+it("does not offer a saved-project action for an unsaved preview", async () => {
+  api.evaluate.mockResolvedValue({ type: "project_created", data: { projectId: null, project: { name: "Preview" } } });
+  mount();
+  await waitFor(() => expect(screen.getByPlaceholderText(t.es.askPlaceholder)).not.toBeDisabled());
+  expect(screen.queryByRole("button", { name: t.es.assistant_open_project })).not.toBeInTheDocument();
+  expect(screen.getByTestId("destination").textContent).toBe("/es/projects");
+});
+
+it("keeps each evaluation button tied to its own request after later responses", async () => {
+  api.evaluate.mockResolvedValue({ type: "evaluation", data: { matchedRules: [], requirements: [], reference: [], contextCr: [], risk: "medio", foundryUsed: true } });
+  mount();
+  await screen.findByRole("button", { name: t.es.assistant_open_evaluator });
+  await waitFor(() => expect(screen.getByPlaceholderText(t.es.askPlaceholder)).not.toBeDisabled());
+  fireEvent.change(screen.getByPlaceholderText(t.es.askPlaceholder), { target: { value: "Evalúa una vivienda de 120 m²" } });
+  fireEvent.submit(screen.getByPlaceholderText(t.es.askPlaceholder).closest("form")!);
+  await waitFor(() => expect(screen.getAllByRole("button", { name: t.es.assistant_open_evaluator })).toHaveLength(2));
+  fireEvent.click(screen.getAllByRole("button", { name: t.es.assistant_open_evaluator })[0]);
+  expect(screen.getByTestId("result")).toHaveTextContent('"area_m2":350');
+  fireEvent.click(screen.getAllByRole("button", { name: t.es.assistant_open_evaluator })[1]);
+  expect(screen.getByTestId("result")).toHaveTextContent('"area_m2":120');
 });

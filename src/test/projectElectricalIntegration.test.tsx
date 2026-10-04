@@ -17,6 +17,7 @@ vi.mock("@/contexts/LangContext", () => ({useLang:()=>({lang:"es",tr:t.es})}));
 const assistant = {setPageContext:vi.fn(),setInput:vi.fn()};
 vi.mock("@/contexts/AssistantContext", () => ({useAssistant:()=>assistant}));
 vi.mock("@/services/sokolApi", async importOriginal => ({...await importOriginal<typeof import("@/services/sokolApi")>(),sokolApi:{updateProject:fixture.update,postElectricalPreliminary:fixture.compute}}));
+vi.mock("@/components/ProjectCodeRules", () => ({ ProjectCodeRules: () => null }));
 vi.mock("@/components/electrical/ElectricalDiagramEditor", () => ({ElectricalDiagramEditor:({value}:{value:{topology:{nodes:{label:string}[]}}})=> {
   const [initial, setInitial] = useState(value);
   return <><p>Diagram editor {initial.topology.nodes.map(node=>node.label).join(", ")}</p><button onClick={()=>setInitial({topology:{nodes:[{label:"Local draft"}]}})}>Edit local diagram</button></>;

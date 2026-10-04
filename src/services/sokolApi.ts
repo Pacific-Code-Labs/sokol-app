@@ -198,6 +198,7 @@ export type ProjectBuildingType = "residencial" | "comercial" | "industrial";
 /** Request body for POST /projects (ProjectCreate). */
 export interface ProjectCreateRequest {
   name: string;
+  notes?: string;
   /** FCR-102: 'fire' (default) | 'electrical'. */
   project_type?: string;
   building_type: ProjectBuildingType;
@@ -229,6 +230,7 @@ export type ProjectUpdateRequest = Partial<ProjectCreateRequest>;
 export interface ProjectResponse {
   id: string;
   name: string;
+  notes?: string | null;
   buildingType: ProjectBuildingType;
   usage: string;
   areaM2?: number | null;

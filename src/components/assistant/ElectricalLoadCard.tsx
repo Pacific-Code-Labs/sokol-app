@@ -5,7 +5,7 @@
  * schedule table, a recharts phase-balance bar chart, a mandated-provisions
  * checklist, assumptions / references, and the disclaimer. Bilingual via useLang.
  */
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -29,12 +29,12 @@ import type { ElectricalLoadData } from "@/lib/assistantResponse";
 import { electricalNodeTypes, type ElectricalRFNode } from "@/components/electrical/electricalNodes";
 import { topologyToFlow } from "@/components/electrical/topologyLayout";
 
-import { DiagramDownloadMenu, type DiagramFormat } from "@/components/electrical/DiagramDownloadMenu";
-import { downloadDiagram } from "@/components/electrical/downloadDiagram";
-import { toast } from "sonner";
+import { ElectricalDiagramModal } from "@/components/electrical/ElectricalDiagramModal";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   data: ElectricalLoadData;
+  hideCodeRules?: boolean;
 }
 
 function fmt(n: number): string {
@@ -50,19 +50,10 @@ const PHASE_COLORS = [
 ];
 
 function Diagram({ nodes, edges }: { nodes: ElectricalRFNode[]; edges: Edge[] }) {
-  const ref = useRef<HTMLDivElement>(null);
   const { tr } = useLang();
-  const [busy, setBusy] = useState(false);
-  const download = async (format: DiagramFormat) => {
-    if (!ref.current) return;
-    setBusy(true);
-    try { await downloadDiagram(ref.current, nodes, format, tr.elec_diagram_preliminary, { conductors: tr.elec_conductors, conduit: tr.elec_conduit, feederLength: tr.elec_feeder_length, protection: tr.elec_protection, interruptingRating: tr.elec_interrupting_rating, grounding: tr.elec_grounding, pending: tr.elec_pending_validation, title: tr.elec_single_line }, edges); }
-    catch { toast.error(tr.elec_export_error); }
-    finally { setBusy(false); }
-  };
+  const [open, setOpen] = useState(false);
   return <div className="space-y-2">
-    <DiagramDownloadMenu busy={busy} onDownload={download} />
-    <div ref={ref} className="h-56 w-full overflow-hidden rounded-md border border-border bg-background/40">
+    <div className="relative h-56 w-full overflow-hidden rounded-md border border-border bg-background/40">
       <ReactFlowProvider>
         <ReactFlow
           nodes={nodes}
@@ -81,11 +72,15 @@ function Diagram({ nodes, edges }: { nodes: ElectricalRFNode[]; edges: Edge[] })
           <Background />
         </ReactFlow>
       </ReactFlowProvider>
+      <Button variant="ghost" className="absolute inset-0 z-10 h-full w-full items-end justify-end rounded-none p-3" onClick={() => setOpen(true)} aria-label={tr.diagram_open}>
+        <span className="rounded-md border bg-background px-3 py-2 text-xs">{tr.diagram_open}</span>
+      </Button>
     </div>
+    <ElectricalDiagramModal open={open} onOpenChange={setOpen} nodes={nodes} edges={edges} />
   </div>;
 }
 
-export function ElectricalLoadCard({ data }: Props) {
+export function ElectricalLoadCard({ data, hideCodeRules = false }: Props) {
   const { tr } = useLang();
   const flow = useMemo(
     () => topologyToFlow(data.topology ?? { nodes: [], edges: [] }),
@@ -181,7 +176,7 @@ export function ElectricalLoadCard({ data }: Props) {
       )}
 
       {/* Mandated provisions checklist */}
-      {data.mandatedProvisions?.length > 0 && (
+      {!hideCodeRules && data.mandatedProvisions?.length > 0 && (
         <div className="rounded-md border border-border p-2">
           <div className="mb-1.5 text-xs font-semibold">{tr.elec_mandated_provisions}</div>
           <ul className="space-y-1.5">
@@ -223,7 +218,7 @@ export function ElectricalLoadCard({ data }: Props) {
       )}
 
       {/* References */}
-      {data.references?.length > 0 && (
+      {!hideCodeRules && data.references?.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <span className="font-semibold">{tr.elec_references}:</span>
           {data.references.map((r) => (

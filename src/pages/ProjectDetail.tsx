@@ -10,6 +10,8 @@ import { ArrowLeft, FileDown, ListChecks, BookOpen, MapPin, Zap, Pencil, Trash2 
 import { BuildingType } from "@/services/sokolApi";
 import { ElectricalLoadCard } from "@/components/assistant/ElectricalLoadCard";
 import { localizedPath } from "@/lib/paths";
+import { ProjectCodeRules } from "@/components/ProjectCodeRules";
+import { createProjectPdf } from "@/lib/projectPdf";
 
 import { toast } from "sonner";
 import {
@@ -60,8 +62,19 @@ export default function ProjectDetail() {
   const { remove, deleting } = useProjects();
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const { lang, tr } = useLang();
   const { setPageContext, setInput } = useAssistant();
+
+  const exportPdf = async () => {
+    if (!project) return;
+    setExporting(true);
+    try {
+      const pdf = await createProjectPdf(project, lang, tr);
+      pdf.save(`${project.name.replace(/[^\p{L}\p{N} _-]/gu, "").trim() || project.id}.pdf`);
+    } catch { toast.error(tr.project_pdf_error); }
+    finally { setExporting(false); }
+  };
 
   const deleteProject = async () => {
     try {
@@ -129,7 +142,8 @@ export default function ProjectDetail() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" disabled className="gap-2">
+                <Button asChild variant="outline" className="gap-2"><Link to={localizedPath(lang, `/projects/${project.id}?edit=1`)}><Pencil className="h-4 w-4" />{tr.project_edit}</Link></Button>
+                <Button variant="outline" disabled={exporting} onClick={exportPdf} className="gap-2">
                   <FileDown className="h-4 w-4" /> {tr.export_pdf}
                 </Button>
                 <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
@@ -173,6 +187,7 @@ export default function ProjectDetail() {
               </Card>
 
               <div className="lg:col-span-2 grid gap-4">
+                <Card><CardHeader><CardTitle className="text-sm">{tr.project_notes}</CardTitle></CardHeader><CardContent><p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">{project.notes || tr.no_data}</p></CardContent></Card>
                 {!project.electrical?.result && <Button asChild variant="outline" className="justify-self-start gap-2" data-tour="diagram">
                   <Link to={localizedPath(lang, "/projects/electrical") + `?projectId=${encodeURIComponent(project.id)}`}><Zap className="h-4 w-4" />{tr.new_electrical}</Link>
                 </Button>}
@@ -194,7 +209,7 @@ export default function ProjectDetail() {
                       </Button>
                     </CardHeader>
                     <CardContent>
-                      <ElectricalLoadCard data={project.electrical.result} />
+                      <ElectricalLoadCard data={{ ...project.electrical.result, topology: project.electrical.topology?.nodes.length ? project.electrical.topology : project.electrical.result.topology }} hideCodeRules />
                     </CardContent>
                   </Card>
                 ) : null}
@@ -221,6 +236,7 @@ export default function ProjectDetail() {
                 )}
               </div>
             </div>
+            <ProjectCodeRules key={project.id} project={project} />
           </>
         )}
       </div>

@@ -10,6 +10,7 @@ vi.mock("@/hooks/useMe", () => ({ useMe: () => ({ tier: "pro" }) }));
 vi.mock("@/hooks/useRbac", () => ({ usePermissions: () => ({ isReady: true, isAdmin: true, isOwner: true, can: () => true }) }));
 vi.mock("@/hooks/useRealtimeEvents", () => ({ useRealtimeEvents: () => {} }));
 vi.mock("@/components/LanguageToggle", () => ({ LanguageToggle: () => <Link to="/en/projects">English</Link> }));
+vi.mock("@/components/NewProjectDrawer", () => ({ NewProjectDrawer: () => null }));
 vi.mock("@/components/AppTutorial", () => ({ AppTutorial: () => null }));
 vi.mock("@/components/ThemeToggle", () => ({ ThemeToggle: () => null }));
 vi.mock("@/services/branding.service", () => ({ getBrandingVM: () => ({ companyName: "Sokol" }) }));

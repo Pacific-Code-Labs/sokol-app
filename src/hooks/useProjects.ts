@@ -34,6 +34,7 @@ export type RiskLevel = "low" | "medium" | "high";
 export interface Project {
   id: string;
   name: string;
+  notes?: string;
   building_type: BuildingType;
   usage: string;
   area_m2: number;
@@ -90,6 +91,7 @@ function fromResponse(r: ProjectResponse): Project {
   return {
     id: r.id,
     name: r.name,
+    notes: r.notes ?? undefined,
     building_type: STRING_TO_BT[r.buildingType] ?? BuildingType.comercial,
     usage: r.usage,
     area_m2: r.areaM2 ?? 0,
@@ -112,6 +114,7 @@ function fromResponse(r: ProjectResponse): Project {
 function toCreateBody(p: NewProjectInput): ProjectCreateRequest {
   return {
     name: p.name,
+    notes: p.notes,
     building_type: BT_TO_STRING[p.building_type] ?? "comercial",
     usage: p.usage,
     area_m2: p.area_m2,
@@ -130,6 +133,7 @@ function toCreateBody(p: NewProjectInput): ProjectCreateRequest {
 /** Partial page-facing patch → BE ProjectUpdate body (only defined keys). */
 function toUpdateBody(patch: Partial<Project>): ProjectUpdateRequest {
   const body: ProjectUpdateRequest = {};
+  if (patch.notes !== undefined) body.notes = patch.notes;
   if (patch.name !== undefined) body.name = patch.name;
   if (patch.building_type !== undefined) body.building_type = BT_TO_STRING[patch.building_type];
   if (patch.usage !== undefined) body.usage = patch.usage;
