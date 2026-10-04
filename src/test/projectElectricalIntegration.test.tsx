@@ -6,15 +6,17 @@ import ProjectDetail from "@/pages/ProjectDetail";
 import { t } from "@/lib/i18n";
 
 const fixture = vi.hoisted(() => ({
+  withoutStudy: false,
+  compute: vi.fn(),
   remove: vi.fn().mockResolvedValue(undefined),
   update: vi.fn().mockResolvedValue({id:"project-one"}),
   project: {id:"project-one",name:"Fire study",projectType:"fire",building_type:1,usage:"Office",area_m2:80,requirements:["Existing fire requirement"],reference:["Existing fire reference"],contextCr:[],createdAt:"2026-10-03",updatedAt:"2026-10-03T00:00:00Z",electrical:{inputs:{occupancy:"comercial",area_m2:80,service:"single_phase"},topology:{nodes:[],edges:[]},result:{topology:{nodes:[],edges:[]},installedVa:1000,demandedVa:1000,demandKva:1,suggestedTransformerKva:5,loadTable:[],phaseBalance:[],mandatedProvisions:[],assumptions:[],references:[],disclaimer:"Preliminary"}}},
 }));
-vi.mock("@/hooks/useProjects", () => ({useProject:()=>({project:fixture.project,loading:false}),useProjects:()=>({remove:fixture.remove,deleting:false})}));
+vi.mock("@/hooks/useProjects", () => ({useProject:()=>({project:fixture.withoutStudy ? {...fixture.project,electrical:undefined} : fixture.project,loading:false}),useProjects:()=>({remove:fixture.remove,deleting:false})}));
 vi.mock("@/contexts/LangContext", () => ({useLang:()=>({lang:"es",tr:t.es})}));
 const assistant = {setPageContext:vi.fn(),setInput:vi.fn()};
 vi.mock("@/contexts/AssistantContext", () => ({useAssistant:()=>assistant}));
-vi.mock("@/services/sokolApi", async importOriginal => ({...await importOriginal<typeof import("@/services/sokolApi")>(),sokolApi:{updateProject:fixture.update}}));
+vi.mock("@/services/sokolApi", async importOriginal => ({...await importOriginal<typeof import("@/services/sokolApi")>(),sokolApi:{updateProject:fixture.update,postElectricalPreliminary:fixture.compute}}));
 vi.mock("@/components/electrical/ElectricalDiagramEditor", () => ({ElectricalDiagramEditor:({value}:{value:{topology:{nodes:{label:string}[]}}})=> {
   const [initial, setInitial] = useState(value);
   return <><p>Diagram editor {initial.topology.nodes.map(node=>node.label).join(", ")}</p><button onClick={()=>setInitial({topology:{nodes:[{label:"Local draft"}]}})}>Edit local diagram</button></>;
@@ -85,4 +87,30 @@ it("keeps the confirmation open when deleting a project fails", async () => {
   await waitFor(()=>expect(fixture.remove).toHaveBeenCalledWith("project-one"));
   expect(screen.getByRole("alertdialog")).toBeInTheDocument();
   expect(screen.queryByText("Project grid")).not.toBeInTheDocument();
+});
+
+it("redirects an unscoped electrical URL to projects without opening the editor", () => {
+  render(<MemoryRouter initialEntries={["/es/projects/electrical"]}><Routes>
+    <Route path="/es/projects/electrical" element={<ElectricalProject />} />
+    <Route path="/es/projects" element={<p>Select an existing project</p>} />
+  </Routes></MemoryRouter>);
+  expect(screen.getByText("Select an existing project")).toBeInTheDocument();
+  expect(screen.queryByText(/Diagram editor/)).not.toBeInTheDocument();
+});
+
+it("starts a study from saved building data and attaches it without creating another project", async () => {
+  fixture.withoutStudy = true;
+  fixture.compute.mockResolvedValue(fixture.project.electrical.result);
+  fixture.update.mockClear();
+  try {
+    render(<MemoryRouter initialEntries={["/es/projects/electrical?projectId=project-one"]}><ElectricalProject /></MemoryRouter>);
+    await waitFor(() => expect(fixture.compute).toHaveBeenCalledOnce());
+    expect(fixture.compute.mock.calls[0][0].inputs).toMatchObject({ occupancy: "residencial", area_m2: 80 });
+    fireEvent.click(await screen.findByRole("button", { name: t.es.elec_update }));
+    await waitFor(() => expect(fixture.update).toHaveBeenCalledOnce());
+    expect(fixture.update.mock.calls[0][0]).toBe("project-one");
+    expect(Object.keys(fixture.update.mock.calls[0][1])).toEqual(["electrical"]);
+  } finally {
+    fixture.withoutStudy = false;
+  }
 });

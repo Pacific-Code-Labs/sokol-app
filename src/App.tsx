@@ -13,7 +13,6 @@ import NewOrganization from "./pages/NewOrganization.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import DemoProject from "./pages/DemoProject.tsx";
 import Projects from "./pages/Projects.tsx";
-import NewProject from "./pages/NewProject.tsx";
 import ProjectDetail from "./pages/ProjectDetail.tsx";
 import ElectricalProject from "./pages/ElectricalProject.tsx";
 import Pricing from "./pages/Pricing.tsx";
@@ -98,7 +97,7 @@ const App = () => (
                   <Route path="organizations/new" element={<NewOrganization />} />
                   <Route path="demo-project" element={<DemoProject />} />
                   <Route path="projects" element={<Projects />} />
-                  <Route path="projects/new" element={<NewProject />} />
+                  <Route path="projects/new" element={<Navigate to="../projects?new=1" replace />} />
                   <Route path="projects/electrical" element={<ElectricalProject />} />
                   <Route path="projects/:id" element={<ProjectDetail />} />
                   <Route path="support" element={<SupportList />} />

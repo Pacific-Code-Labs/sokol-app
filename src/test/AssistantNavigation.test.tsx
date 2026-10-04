@@ -47,7 +47,6 @@ it("opens the evaluator with the actual returned rules and preserves the request
 it.each([
   [{ type: "project_created", data: { projectId: "new-project", project: { name: "Restaurante" } } }, "/es/projects/new-project"],
   [{ type: "electrical_load", data: { projectId: "saved-project", demandKva: 12 } }, "/es/projects/electrical?projectId=saved-project"],
-  [{ type: "electrical_load", data: { demandKva: 12 } }, "/es/projects/electrical"],
 ])("opens the workspace for a completed result", async (response, path) => {
   api.evaluate.mockResolvedValue(response);
   mount();
@@ -70,5 +69,14 @@ it("does not navigate the public demo into signed-in pages", async () => {
   await waitFor(() => expect(api.evaluateDemo).toHaveBeenCalledOnce());
   await waitFor(() => expect(screen.getByPlaceholderText(t.es.askPlaceholder)).not.toBeDisabled());
   expect(screen.getByTestId("destination")).toHaveTextContent("/es/projects");
+  expect(close).not.toHaveBeenCalled();
+});
+
+it("keeps an electrical result without a saved project in chat", async () => {
+  const close = vi.fn();
+  api.evaluate.mockResolvedValue({ type: "electrical_load", data: { demandKva: 12 } });
+  mount({ close });
+  await waitFor(() => expect(screen.getByPlaceholderText(t.es.askPlaceholder)).not.toBeDisabled());
+  expect(screen.getByTestId("destination").textContent).toBe("/es/projects");
   expect(close).not.toHaveBeenCalled();
 });

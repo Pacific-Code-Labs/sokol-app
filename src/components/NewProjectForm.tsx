@@ -1,15 +1,14 @@
 import { FormEvent, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useProjects } from "@/hooks/useProjects";
 import { useLang } from "@/contexts/LangContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { sokolApi, BuildingType, QuotaError } from "@/services/sokolApi";
 import type { RiskLevel } from "@/hooks/useProjects";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@pacific-code-labs/sokol-design-system";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { localizedPath } from "@/lib/paths";
@@ -23,7 +22,7 @@ function normalizeRisk(raw?: string): RiskLevel | undefined {
   return undefined;
 }
 
-export default function NewProject() {
+export default function NewProjectForm({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
   const { create } = useProjects();
   const { lang, tr } = useLang();
@@ -105,21 +104,11 @@ export default function NewProject() {
   return (
     <>
       <div className="max-w-2xl space-y-4">
-        <Button asChild variant="ghost" size="sm" className="gap-1 -ml-2">
-          <Link to={localizedPath(lang, "/projects")}><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
-        </Button>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{tr.new_project}</CardTitle>
-            <CardDescription>{tr.save_run_eval}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={onSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="name">{tr.project_name} *</Label>
-                <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
-              </div>
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="name">{tr.project_name} *</Label>
+            <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -165,15 +154,13 @@ export default function NewProject() {
               {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
 
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => navigate(-1)}>{tr.cancel}</Button>
+                <Button type="button" variant="outline" onClick={onClose}>{tr.cancel}</Button>
                 <Button type="submit" disabled={submitting}>
                   {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   {tr.create_project_btn}
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
       </div>
       <UpgradeModal quota={quota} onClose={() => setQuota(null)} />
     </>

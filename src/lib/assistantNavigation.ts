@@ -9,6 +9,7 @@ export function assistantDestination(result: NormalizedResponse, request: Evalua
     case "project_created":
       return { path: result.data.projectId ? `/projects/${encodeURIComponent(result.data.projectId)}` : "/projects" };
     case "electrical_load":
+      if (!result.data.projectId) return null;
       return {
         path: "/projects/electrical" + (result.data.projectId ? `?projectId=${encodeURIComponent(result.data.projectId)}` : ""),
         state: { assistantElectrical: result.data, assistantRequest: request },

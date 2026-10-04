@@ -11,6 +11,7 @@ import { useRealtimeEvents } from "@/hooks/useRealtimeEvents";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AppTutorial } from "@/components/AppTutorial";
+import { NewProjectDrawer } from "@/components/NewProjectDrawer";
 import { GlobalAssistant } from "@/components/GlobalAssistant";
 import { PageTransition } from "@/components/PageTransition";
 import { localizedPath, stripLangPrefix } from "@/lib/paths";
@@ -64,5 +65,6 @@ export function DashboardLayout() {
       </div>}
     ><div className="mx-auto max-w-6xl"><PageTransition><Outlet /></PageTransition></div></AppShell>
     <GlobalAssistant />
+    <NewProjectDrawer />
   </>;
 }

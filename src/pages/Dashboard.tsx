@@ -51,7 +51,7 @@ export default function Dashboard() {
             </CardContent>
             <CardContent className="mt-auto">
               <Button asChild variant="outline" className="w-full gap-2">
-                <Link to={localizedPath(lang, "/projects/new")}>
+                <Link to={localizedPath(lang, "/dashboard?new=1")}>
                   <Plus className="h-4 w-4" />
                   {tr.new_project}
                 </Link>
@@ -94,7 +94,7 @@ export default function Dashboard() {
                 <FolderKanban className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground mb-4">{tr.no_projects}</p>
                 <Button asChild size="sm">
-                  <Link to={localizedPath(lang, "/projects/new")}>{tr.create_first}</Link>
+                  <Link to={localizedPath(lang, "/dashboard?new=1")}>{tr.create_first}</Link>
                 </Button>
               </div>
             ) : (

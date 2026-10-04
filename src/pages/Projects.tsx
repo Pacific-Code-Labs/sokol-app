@@ -5,7 +5,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
 import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
-import { FolderKanban, Plus, Zap } from "lucide-react";
+import { FolderKanban, Plus } from "lucide-react";
 import { BuildingType } from "@/services/sokolApi";
 import { localizedPath } from "@/lib/paths";
 
@@ -35,11 +35,8 @@ export default function Projects() {
             <p className="text-sm text-muted-foreground">{tr.projects_subtitle}</p>
           </div>
           <div data-tour="projects" className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" className="gap-2">
-              <Link to={localizedPath(lang, "/projects/electrical")}><Zap className="h-4 w-4" /> {tr.new_electrical}</Link>
-            </Button>
             <Button asChild className="gap-2">
-              <Link to={localizedPath(lang, "/projects/new")}><Plus className="h-4 w-4" /> {tr.new_project}</Link>
+              <Link to={localizedPath(lang, "/projects?new=1")}><Plus className="h-4 w-4" /> {tr.new_project}</Link>
             </Button>
           </div>
         </div>
@@ -47,13 +44,13 @@ export default function Projects() {
         {loading ? (
           <p className="p-6 text-sm text-muted-foreground">{tr.loading}</p>
         ) : projects.length === 0 ? (
-          <div className="text-center py-16">
+          <div data-tour="diagram" className="text-center py-16">
             <FolderKanban className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground mb-4">{tr.no_projects}</p>
-            <Button asChild size="sm"><Link to={localizedPath(lang, "/projects/new")}>{tr.create_first}</Link></Button>
+            <Button asChild size="sm"><Link to={localizedPath(lang, "/projects?new=1")}>{tr.create_first}</Link></Button>
           </div>
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <ul data-tour="diagram" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {projects.map((p) => (
               <li key={p.id} className="flex">
                 <Link to={localizedPath(lang, `/projects/${p.id}`)} className="min-w-0 flex-1 space-y-3 rounded-xl border border-border bg-card p-5 shadow-sm transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">

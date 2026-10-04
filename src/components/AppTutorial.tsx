@@ -31,7 +31,7 @@ export function AppTutorial({ userId, ready, projects, evaluator, dashboard }: P
     ...(dashboard ? [{ id: "dashboard", path: "/dashboard", title: tr.tour_dashboard_title, description: tr.tour_dashboard_desc }] : []),
     ...(projects ? [{ id: "projects", path: "/projects", title: tr.tour_projects_title, description: tr.tour_projects_desc }] : []),
     ...(evaluator ? [{ id: "evaluator", path: "/dashboard/evaluator", title: tr.tour_evaluator_title, description: tr.tour_evaluator_desc }] : []),
-    ...(projects ? [{ id: "diagram", path: "/projects/electrical", title: tr.tour_diagram_title, description: tr.tour_diagram_desc }] : []),
+    ...(projects ? [{ id: "diagram", path: "/projects", title: tr.tour_diagram_title, description: tr.tour_diagram_desc }] : []),
     { id: "assistant", path: projects ? "/projects" : "/dashboard/profile", title: tr.tour_assistant_title, description: tr.tour_assistant_desc },
     { id: "profile", path: "/dashboard/profile", title: tr.tour_profile_title, description: tr.tour_profile_desc },
   ], [dashboard, projects, evaluator, tr]);

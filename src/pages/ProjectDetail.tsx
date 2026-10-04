@@ -173,6 +173,9 @@ export default function ProjectDetail() {
               </Card>
 
               <div className="lg:col-span-2 grid gap-4">
+                {!project.electrical?.result && <Button asChild variant="outline" className="justify-self-start gap-2" data-tour="diagram">
+                  <Link to={localizedPath(lang, "/projects/electrical") + `?projectId=${encodeURIComponent(project.id)}`}><Zap className="h-4 w-4" />{tr.new_electrical}</Link>
+                </Button>}
                 {project.electrical?.result ? (
                   /* FCR-118: an electrical study is mapped INSIDE its project — render
                      the full study snapshot here, with a link back into the editor. */
