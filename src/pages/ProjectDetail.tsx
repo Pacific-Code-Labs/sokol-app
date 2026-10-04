@@ -1,15 +1,22 @@
-import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { useProject } from "@/hooks/useProjects";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useProject, useProjects } from "@/hooks/useProjects";
 import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
-import { ArrowLeft, FileDown, ListChecks, BookOpen, MapPin, Zap, Pencil } from "lucide-react";
+import { ArrowLeft, FileDown, ListChecks, BookOpen, MapPin, Zap, Pencil, Trash2 } from "lucide-react";
 import { BuildingType } from "@/services/sokolApi";
 import { ElectricalLoadCard } from "@/components/assistant/ElectricalLoadCard";
 import { localizedPath } from "@/lib/paths";
+
+import { toast } from "sonner";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogTrigger,
+} from "@pacific-code-labs/sokol-design-system";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -50,8 +57,21 @@ function ListBlock({ title, icon: Icon, items, emptyText }: { title: string; ico
 export default function ProjectDetail() {
   const { id = "" } = useParams();
   const { project, loading } = useProject(id);
+  const { remove, deleting } = useProjects();
+  const navigate = useNavigate();
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const { lang, tr } = useLang();
   const { setPageContext, setInput } = useAssistant();
+
+  const deleteProject = async () => {
+    try {
+      await remove(id);
+      setDeleteOpen(false);
+      navigate(localizedPath(lang, "/projects"), { replace: true });
+    } catch {
+      toast.error(tr.project_delete_error);
+    }
+  };
 
   const buildingLabel: Record<number, string> = {
     [BuildingType.residencial]: tr.bt_residential,
@@ -108,10 +128,31 @@ export default function ProjectDetail() {
                   {tr.created} {new Date(project.createdAt).toLocaleString()}
                 </p>
               </div>
-              <Button variant="outline" disabled className="gap-2">
-                <FileDown className="h-4 w-4" />
-                {tr.export_pdf}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" disabled className="gap-2">
+                  <FileDown className="h-4 w-4" /> {tr.export_pdf}
+                </Button>
+                <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" className="gap-2 text-destructive">
+                      <Trash2 className="h-4 w-4" /> {tr.delete}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{tr.delete_project}</AlertDialogTitle>
+                      <AlertDialogDescription>{tr.delete_confirm}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={deleting}>{tr.cancel}</AlertDialogCancel>
+                      <AlertDialogAction disabled={deleting} onClick={(event) => {
+                        event.preventDefault();
+                        void deleteProject();
+                      }}>{tr.delete}</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-4">

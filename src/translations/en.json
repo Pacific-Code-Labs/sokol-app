@@ -108,6 +108,7 @@
       "actions": "Actions",
       "view": "View",
       "delete": "Delete",
+      "project_delete_error": "Could not delete the project. Please try again.",
       "delete_project": "Delete project?",
       "delete_confirm": "This removes the project from your workspace. This cannot be undone.",
       "cancel": "Cancel",

@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import ElectricalProject from "@/pages/ElectricalProject";
 import ProjectDetail from "@/pages/ProjectDetail";
 import { t } from "@/lib/i18n";
 
 const fixture = vi.hoisted(() => ({
+  remove: vi.fn().mockResolvedValue(undefined),
   update: vi.fn().mockResolvedValue({id:"project-one"}),
   project: {id:"project-one",name:"Fire study",projectType:"fire",building_type:1,usage:"Office",area_m2:80,requirements:["Existing fire requirement"],reference:["Existing fire reference"],contextCr:[],createdAt:"2026-10-03",updatedAt:"2026-10-03T00:00:00Z",electrical:{inputs:{occupancy:"comercial",area_m2:80,service:"single_phase"},topology:{nodes:[],edges:[]},result:{topology:{nodes:[],edges:[]},installedVa:1000,demandedVa:1000,demandKva:1,suggestedTransformerKva:5,loadTable:[],phaseBalance:[],mandatedProvisions:[],assumptions:[],references:[],disclaimer:"Preliminary"}}},
 }));
-vi.mock("@/hooks/useProjects", () => ({useProject:()=>({project:fixture.project,loading:false})}));
+vi.mock("@/hooks/useProjects", () => ({useProject:()=>({project:fixture.project,loading:false}),useProjects:()=>({remove:fixture.remove,deleting:false})}));
 vi.mock("@/contexts/LangContext", () => ({useLang:()=>({lang:"es",tr:t.es})}));
 const assistant = {setPageContext:vi.fn(),setInput:vi.fn()};
 vi.mock("@/contexts/AssistantContext", () => ({useAssistant:()=>assistant}));
@@ -56,4 +57,32 @@ it("replaces a local draft even when the saved diagram content is unchanged", as
   fixture.project = {...fixture.project, updatedAt:"2026-10-03T00:01:00Z"};
   view.rerender(<MemoryRouter initialEntries={["/es/projects/electrical?projectId=project-one"]}><ElectricalProject /></MemoryRouter>);
   expect(await screen.findByText("Diagram editor Updated panel")).toBeInTheDocument();
+});
+
+
+it("deletes from project details and returns to the project grid after saving", async () => {
+  fixture.remove.mockClear();
+  fixture.remove.mockResolvedValue(undefined);
+  render(<MemoryRouter initialEntries={["/es/projects/project-one"]}><Routes>
+    <Route path="/es/projects/:id" element={<ProjectDetail />} />
+    <Route path="/es/projects" element={<p>Project grid</p>} />
+  </Routes></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button", {name:t.es.delete}));
+  fireEvent.click(screen.getByRole("button", {name:t.es.delete, hidden:false}));
+  await screen.findByText("Project grid");
+  expect(fixture.remove).toHaveBeenCalledWith("project-one");
+});
+
+it("keeps the confirmation open when deleting a project fails", async () => {
+  fixture.remove.mockClear();
+  fixture.remove.mockRejectedValueOnce(new Error("Save failed"));
+  render(<MemoryRouter initialEntries={["/es/projects/project-one"]}><Routes>
+    <Route path="/es/projects/:id" element={<ProjectDetail />} />
+    <Route path="/es/projects" element={<p>Project grid</p>} />
+  </Routes></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button", {name:t.es.delete}));
+  fireEvent.click(screen.getByRole("button", {name:t.es.delete, hidden:false}));
+  await waitFor(()=>expect(fixture.remove).toHaveBeenCalledWith("project-one"));
+  expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+  expect(screen.queryByText("Project grid")).not.toBeInTheDocument();
 });

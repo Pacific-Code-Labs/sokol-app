@@ -5,23 +5,13 @@ import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
 import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
-import { FolderKanban, Plus, Trash2, Eye, Zap } from "lucide-react";
+import { FolderKanban, Plus, Zap } from "lucide-react";
 import { BuildingType } from "@/services/sokolApi";
 import { localizedPath } from "@/lib/paths";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@pacific-code-labs/sokol-design-system";
+
 
 export default function Projects() {
-  const { projects, loading, remove } = useProjects();
+  const { projects, loading } = useProjects();
   const { lang, tr } = useLang();
   const { setPageContext, setInput } = useAssistant();
 
@@ -65,8 +55,8 @@ export default function Projects() {
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {projects.map((p) => (
-              <li key={p.id} className="flex flex-col rounded-xl border border-border bg-card p-5 shadow-sm">
-                <Link to={localizedPath(lang, `/projects/${p.id}`)} className="min-w-0 flex-1 space-y-3">
+              <li key={p.id} className="flex">
+                <Link to={localizedPath(lang, `/projects/${p.id}`)} className="min-w-0 flex-1 space-y-3 rounded-xl border border-border bg-card p-5 shadow-sm transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <div className="flex items-start justify-between gap-2">
                     <FolderKanban className="h-6 w-6 shrink-0 text-primary" />
                     <RiskBadge level={p.risk} />
@@ -76,16 +66,7 @@ export default function Projects() {
                   <p className="text-sm">{p.area_m2} m²</p>
                   <p className="text-xs text-muted-foreground">{new Date(p.createdAt).toLocaleDateString(lang)}</p>
                 </Link>
-                <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-                  <Button asChild variant="outline" size="sm"><Link to={localizedPath(lang, `/projects/${p.id}`)}><Eye className="mr-2 h-4 w-4" />{tr.view}</Link></Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild><Button variant="ghost" size="icon" aria-label={tr.delete}><Trash2 className="h-4 w-4 text-destructive" /></Button></AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader><AlertDialogTitle>{tr.delete_project}</AlertDialogTitle><AlertDialogDescription>{tr.delete_confirm}</AlertDialogDescription></AlertDialogHeader>
-                      <AlertDialogFooter><AlertDialogCancel>{tr.cancel}</AlertDialogCancel><AlertDialogAction onClick={() => remove(p.id)}>{tr.delete}</AlertDialogAction></AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+
               </li>
             ))}
           </ul>

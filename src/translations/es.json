@@ -108,6 +108,7 @@
       "actions": "Acciones",
       "view": "Ver",
       "delete": "Eliminar",
+      "project_delete_error": "No se pudo eliminar el proyecto. Inténtelo nuevamente.",
       "delete_project": "¿Eliminar proyecto?",
       "delete_confirm": "Esto eliminará el proyecto de su espacio de trabajo. No se puede deshacer.",
       "cancel": "Cancelar",
