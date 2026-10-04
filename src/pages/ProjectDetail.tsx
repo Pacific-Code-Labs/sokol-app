@@ -153,7 +153,8 @@ export default function ProjectDetail() {
                       <ElectricalLoadCard data={project.electrical.result} />
                     </CardContent>
                   </Card>
-                ) : (
+                ) : null}
+                {(!project.electrical?.result || project.projectType !== "electrical") && (
                   <>
                     <ListBlock title={tr.requirements} icon={ListChecks} items={project.requirements} emptyText={tr.no_data} />
                     <div className="grid sm:grid-cols-2 gap-4">

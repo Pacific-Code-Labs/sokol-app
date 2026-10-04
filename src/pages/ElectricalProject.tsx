@@ -150,7 +150,7 @@ export default function ElectricalProject() {
       };
       // FCR-118: edit in place when we loaded an existing study, else create.
       const saved = editId
-        ? await sokolApi.updateProject(editId, body)
+        ? await sokolApi.updateProject(editId, editProject?.projectType === "electrical" ? body : { electrical: body.electrical })
         : await sokolApi.createProject(body);
       toast.success(tr.elec_saved);
       navigate(localizedPath(lang, `/projects/${saved.id}`));
