@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, MailCheck, RefreshCw } from "lucide-react";
 import { Button, FormField, OtpInput } from "@pacific-code-labs/sokol-design-system";
@@ -15,6 +15,7 @@ export default function VerifyEmail() {
   const { lang, tr } = useLang();
   const navigate = useNavigate();
 
+  const verifyingRef = useRef(false);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [verifying, setVerifying] = useState(false);
@@ -37,16 +38,18 @@ export default function VerifyEmail() {
     return () => window.clearTimeout(id);
   }, [cooldown]);
 
-  const handleVerify = async () => {
-    if (code.length !== 6) {
+  const handleVerify = async (completedCode: string) => {
+    if (verifyingRef.current || !email) return;
+    if (!/^\d{6}$/.test(completedCode)) {
       setError(tr.auth_verify_incorrect_code);
       return;
     }
+    verifyingRef.current = true;
     setVerifying(true);
     setError(null);
     try {
       try {
-        await confirmSignUp(email, code);
+        await confirmSignUp(email, completedCode);
       } catch (e: unknown) {
         // The PostConfirmation trigger (saves the user in the DB) runs after Cognito has
         // already confirmed the account; a trigger timeout surfaces as this error. The account
@@ -74,6 +77,7 @@ export default function VerifyEmail() {
       else if (name === "ExpiredCodeException") setError(tr.auth_verify_expired_code);
       else setError(message);
     } finally {
+      verifyingRef.current = false;
       setVerifying(false);
     }
   };
@@ -109,13 +113,15 @@ export default function VerifyEmail() {
       }
     >
       <div className="flex flex-col gap-5">
-        <FormField label={tr.auth_verify_code} error={error ?? undefined}>
-          <OtpInput value={code} onChange={setCode} onComplete={handleVerify} autoFocus disabled={verifying} invalid={!!error} />
+        <FormField label={tr.auth_verify_code} error={error ?? undefined} className="items-center text-center">
+          <OtpInput value={code} onChange={(next) => { setCode(next); setError(null); }}
+            onComplete={(completed) => { void handleVerify(completed); }} aria-label={tr.auth_verify_code}
+            className="justify-center" autoFocus disabled={verifying} invalid={!!error} />
         </FormField>
 
         {info && <p className="text-sm text-cat-actuation">{info}</p>}
 
-        <Button variant="primary" size="lg" className="w-full" onClick={handleVerify} disabled={verifying || code.length !== 6}>
+        <Button variant="primary" size="lg" className="w-full" onClick={() => { void handleVerify(code); }} disabled={verifying || code.length !== 6}>
           {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
           {verifying ? tr.auth_verify_submitting : tr.auth_verify_submit}
         </Button>
