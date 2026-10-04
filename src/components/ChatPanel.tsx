@@ -749,6 +749,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       </div>
 
       <form
+        data-tour="assistant"
         onSubmit={(e) => { e.preventDefault(); handleSend(input); }}
         className="flex items-center gap-2 border-t border-border p-3"
       >

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLang } from "@/contexts/LangContext";
 import { localizedPath, stripLangPrefix } from "@/lib/paths";
+import { TutorialSpotlight } from "@/components/TutorialSpotlight";
 
 type Status = "unseen" | "welcome" | "active" | "dismissed" | "complete";
 type Progress = { status: Status; step: string };
@@ -33,7 +34,6 @@ export function AppTutorial({ userId, ready, projects, evaluator, dashboard }: P
     ...(projects ? [{ id: "diagram", path: "/projects/electrical", title: tr.tour_diagram_title, description: tr.tour_diagram_desc }] : []),
     { id: "assistant", path: projects ? "/projects" : "/dashboard/profile", title: tr.tour_assistant_title, description: tr.tour_assistant_desc },
     { id: "profile", path: "/dashboard/profile", title: tr.tour_profile_title, description: tr.tour_profile_desc },
-    { id: "support", path: "/support", title: tr.tour_support_title, description: tr.tour_support_desc },
   ], [dashboard, projects, evaluator, tr]);
   const index = Math.max(0, steps.findIndex(step => step.id === progress.step));
   const step = steps[index];
@@ -78,7 +78,7 @@ export function AppTutorial({ userId, ready, projects, evaluator, dashboard }: P
       </DialogContent>
     </Dialog>
     {progress.status === "active" && ready && createPortal(
-      <section aria-label={tr.tour_replay} className="fixed bottom-24 sm:bottom-5 left-4 right-4 z-40 max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-xl border border-primary/30 bg-card p-5 shadow-xl sm:left-6 sm:right-auto sm:w-[380px] lg:left-[260px]">
+      <TutorialSpotlight selector={atStep ? `[data-tour="${step.id}"]` : null} label={tr.tour_replay}>
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-medium text-primary">{tr.tour_step.replace("{current}", String(index + 1)).replace("{total}", String(steps.length))}</span>
           <Button variant="ghost" size="icon" aria-label={tr.tour_close} onClick={dismiss}><X className="h-4 w-4" /></Button>
@@ -95,11 +95,11 @@ export function AppTutorial({ userId, ready, projects, evaluator, dashboard }: P
         </div>
         {!atStep && <Button variant="link" className="mt-2 px-0" onClick={() => go(index)}>{tr.tour_visit}</Button>}
         <Button variant="link" className="mt-2 h-auto whitespace-normal px-0 text-left" onClick={() => { dismiss(); navigate(localizedPath(lang, "/assistant-guide")); }}>{tr.guide_title}</Button>
-        <div className="mt-4 flex justify-between gap-2">
+        <div className="sticky bottom-0 mt-4 flex justify-between gap-2 bg-card pt-2">
           <Button variant="outline" disabled={index === 0} onClick={() => go(index - 1)}><ChevronLeft className="mr-1 h-4 w-4" />{tr.tour_previous}</Button>
           <Button onClick={() => index === steps.length - 1 ? save({ ...progress, status: "complete" }) : go(index + 1)}>{index === steps.length - 1 ? tr.tour_finish : tr.tour_next}<ChevronRight className="ml-1 h-4 w-4" /></Button>
         </div>
-      </section>, document.body,
+      </TutorialSpotlight>, document.body,
     )}
   </>;
 }

@@ -45,9 +45,9 @@ it("skips unavailable capabilities and records completion without submitting any
   expect(screen.getByText(t.es.tour_assistant_title)).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", {name:t.es.tour_next}));
   expect(screen.getByTestId("location")).toHaveTextContent("/es/dashboard/profile");
-  fireEvent.click(screen.getByRole("button", {name:t.es.tour_next}));
   fireEvent.click(screen.getByRole("button", {name:t.es.tour_finish}));
   expect(JSON.parse(localStorage.getItem(tutorialStorageKey("new-user"))!).status).toBe("complete");
+  expect(screen.getByTestId("location")).toHaveTextContent("/es/dashboard/profile");
   expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 });
 

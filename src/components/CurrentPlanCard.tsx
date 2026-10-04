@@ -13,7 +13,7 @@ export function CurrentPlanCard() {
   const name = me?.usage?.plan?.[`name_${lang}`] || (plan && tr[`plan_${plan.tier}_name`]);
   const description = me?.usage?.plan?.[`description_${lang}`] || (plan && tr[`plan_${plan.tier}_tagline`]);
   return (
-    <Card className="flex flex-col">
+    <Card data-tour="profile" className="flex flex-col">
       <CardHeader><CardTitle>{tr.pricing_current_plan}</CardTitle><CardDescription>{tr.profile_plan_hint}</CardDescription></CardHeader>
       <CardBody className="flex flex-1 flex-col gap-4">
         {isLoading ? <Skeleton className="h-24 w-full" /> : isError || !plan ? (

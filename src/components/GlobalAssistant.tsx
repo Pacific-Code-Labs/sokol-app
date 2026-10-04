@@ -21,6 +21,7 @@ export function GlobalAssistant() {
     !open && typeof document !== "undefined"
       ? createPortal(
           <button
+            data-tour="assistant"
             onClick={() => setOpen(true)}
             aria-label={tr.assistant}
             className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

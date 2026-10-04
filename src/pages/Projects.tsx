@@ -34,7 +34,7 @@ export default function Projects() {
             <h2 className="text-2xl font-bold tracking-tight">{tr.projects_title}</h2>
             <p className="text-sm text-muted-foreground">{tr.projects_subtitle}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div data-tour="projects" className="flex flex-wrap gap-2">
             <Button asChild variant="outline" className="gap-2">
               <Link to={localizedPath(lang, "/projects/electrical")}><Zap className="h-4 w-4" /> {tr.new_electrical}</Link>
             </Button>

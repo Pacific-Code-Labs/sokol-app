@@ -27,6 +27,7 @@ interface Props {
    * values changed.
    */
   flash?: number;
+  tourTarget?: string;
 }
 
 export function BuildingSelector({
@@ -38,6 +39,7 @@ export function BuildingSelector({
   ceilingHeight, onCeilingHeightChange,
   volume, onVolumeChange,
   flash,
+  tourTarget,
 }: Props) {
   const { tr } = useLang();
 
@@ -59,7 +61,7 @@ export function BuildingSelector({
 
   return (
     <div className="panel p-5 space-y-5">
-      <div>
+      <div data-tour={tourTarget}>
         <Label className="text-xs uppercase tracking-wider text-muted-foreground">{tr.selectBuilding}</Label>
         <div className={cn("mt-3 grid grid-cols-3 gap-2 rounded-md", flashCls)}>
           {types.map((t) => {

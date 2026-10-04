@@ -51,7 +51,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="flex flex-col border-primary/30">
+          <Card data-tour="dashboard" className="flex flex-col border-primary/30">
             <CardHeader>
               <CardTitle className="text-sm font-medium">{tr.new_evaluation}</CardTitle>
               <CardDescription>{tr.run_evaluator}</CardDescription>

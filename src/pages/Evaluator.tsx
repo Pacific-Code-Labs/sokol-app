@@ -164,7 +164,7 @@ export default function Evaluator() {
             </section>
 
             {evaluation && (
-              <section className="panel space-y-3 p-4">
+              <section data-tour="evaluator" className="panel space-y-3 p-4">
                 <h2 className="font-semibold">{tr.assistant_evaluation_title}</h2>
                 <p className="text-sm text-muted-foreground">{incoming?.assistantRequest?.user_query}</p>
                 <EvaluationCard data={evaluation} />
@@ -174,6 +174,7 @@ export default function Evaluator() {
 
             {/* Filters */}
             {!evaluation && <BuildingSelector
+              tourTarget="evaluator"
               value={building}      onChange={handleFilterChange(setBuilding)}
               area={area}           onAreaChange={handleFilterChange(setArea)}
               context={context}     onContextChange={handleFilterChange(setContext)}

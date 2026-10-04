@@ -171,7 +171,7 @@ export default function ElectricalProject() {
   };
 
   if (incoming?.assistantElectrical && !editId) return (
-    <section className="space-y-4">
+    <section data-tour="diagram" className="space-y-4">
       <h2 className="text-xl font-semibold">{tr.tour_diagram_title}</h2>
       <ElectricalLoadCard data={incoming.assistantElectrical} />
       <Button variant="outline" onClick={() => navigate(localizedPath(lang, "/projects/electrical"), { state: null })}>{tr.assistant_edit_electrical}</Button>
@@ -194,6 +194,7 @@ export default function ElectricalProject() {
         <div className="grid gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <Field label={tr.elec_occupancy}>
             <Select
+              data-tour="diagram"
               value={inputs.occupancy}
               onChange={(e) => patch({ occupancy: e.target.value as ElectricalInputs["occupancy"] })}
               className="h-9 w-full rounded-md border border-input bg-background pl-2 pr-10 text-sm"
