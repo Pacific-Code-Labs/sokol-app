@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import { EvaluationCard } from "@/components/assistant/EvaluationCard";
 import { BuildingSelector } from "@/components/BuildingSelector";
 import { CategoryCard } from "@/components/CategoryCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@pacific-code-labs/sokol-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
-import { sokolApi, BuildingType, RuleCategory, type EvaluateResponse, type EvaluateRequest, type RuleGroupDTO } from "@/services/sokolApi";
+import { sokolApi, BuildingType, RuleCategory, type EvaluateRequest } from "@/services/sokolApi";
 import { cn } from "@/lib/utils";
 import { tChrome, fmt } from "@/lib/chrome-i18n";
 import { Printer, ShieldAlert, ListChecks, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
@@ -38,13 +37,11 @@ export default function Evaluator() {
   const chrome = tChrome(lang);
   const assistant = useAssistant();
   const location = useLocation();
-  const incoming = location.state as { assistantEvaluation?: EvaluateResponse; assistantRequest?: EvaluateRequest } | null;
-  const [evaluation, setEvaluation] = useState(incoming?.assistantEvaluation);
+  const incoming = location.state as { assistantRequest?: EvaluateRequest } | null;
+  const request = incoming?.assistantRequest;
   useEffect(() => {
-    setEvaluation(incoming?.assistantEvaluation);
-    const request = incoming?.assistantRequest;
     if (!request) return;
-    setBuilding(request.building_type ?? BuildingType.comercial);
+    setBuilding(request.building_type);
     setContext(request.usage ?? "");
     setArea(request.area_m2 ?? 0);
     setFloors(request.floors ?? 0);
@@ -53,30 +50,21 @@ export default function Evaluator() {
     setVolume(request.volume_m3 ?? 0);
     setPage(0);
     setSelectedCategory(null);
-  }, [location.state]);
+  }, [request]);
 
-  const [building, setBuilding]         = useState<BuildingType>(BuildingType.comercial);
-  const [area, setArea]                 = useState<number>(0);
-  const [context, setContext]           = useState<string>("");
-  const [floors, setFloors]             = useState<number>(0);
-  const [occupants, setOccupants]       = useState<number>(0);
-  const [ceilingHeight, setCeilingHeight] = useState<number>(0);
-  const [volume, setVolume]             = useState<number>(0);
+  const [building, setBuilding]         = useState<BuildingType | undefined>(request ? request.building_type : BuildingType.comercial);
+  const [area, setArea]                 = useState<number>(request?.area_m2 ?? 0);
+  const [context, setContext]           = useState<string>(request?.usage ?? "");
+  const [floors, setFloors]             = useState<number>(request?.floors ?? 0);
+  const [occupants, setOccupants]       = useState<number>(request?.occupants ?? 0);
+  const [ceilingHeight, setCeilingHeight] = useState<number>(request?.ceiling_height_m ?? 0);
+  const [volume, setVolume]             = useState<number>(request?.volume_m3 ?? 0);
   const [page, setPage]                 = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<RuleCategory | null>(null);
 
   // Sync the evaluator inputs into the global assistant.
   useEffect(() => {
-    const request = incoming?.assistantRequest;
-    assistant.setInput(evaluation ? {
-      buildingType: request?.building_type,
-      usage: request?.usage,
-      areaM2: request?.area_m2,
-      floors: request?.floors,
-      occupants: request?.occupants,
-      ceilingHeight: request?.ceiling_height_m,
-      volume: request?.volume_m3,
-    } : {
+    assistant.setInput({
       buildingType: building,
       usage: context,
       areaM2: area || undefined,
@@ -87,9 +75,9 @@ export default function Evaluator() {
     });
     assistant.setPageContext({
       page: "evaluation",
-      payload: evaluation ? { request, evaluation } : { building, usage: context, area, floors, occupants, ceilingHeight, volume },
+      payload: { building, usage: context, area, floors, occupants, ceilingHeight, volume },
     });
-  }, [building, context, area, floors, occupants, ceilingHeight, volume, evaluation, location.state]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [building, context, area, floors, occupants, ceilingHeight, volume, location.state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filters = { building, area, context, floors, occupants, ceilingHeight, volume };
 
@@ -110,26 +98,17 @@ export default function Evaluator() {
         language:         lang,
       }),
     staleTime: 30_000,
-    enabled: !evaluation,
   });
 
-  const appliedGroups = Object.values((evaluation?.matchedRules ?? []).reduce<Record<string, RuleGroupDTO>>((groups, rule) => {
-    const group = groups[rule.category] ??= { type: rule.category, description: "", quantity: 0, rules: [] };
-    group.rules.push(rule);
-    group.quantity += 1;
-    return groups;
-  }, {}));
-  const categoryType = CATEGORY_TABS.find(tab => tab.value === selectedCategory)?.type;
-  const ruleGroups = evaluation ? appliedGroups.filter(group => !categoryType || group.type === categoryType) : data?.data ?? [];
-  const pagination = evaluation ? undefined : data?.pagination;
-  const totalRules = evaluation ? evaluation.matchedRules.length : pagination?.totalElements ?? 0;
+  const ruleGroups = data?.data ?? [];
+  const pagination = data?.pagination;
+  const totalRules = pagination?.totalElements ?? 0;
   const highRisk    = ruleGroups.reduce(
     (acc, g) => acc + g.rules.filter((r) => r.risk.level === "alto").length, 0
   );
 
   const handleFilterChange = <T,>(setter: (v: T) => void) => (v: T) => {
     setter(v);
-    setEvaluation(undefined);
     setPage(0);
   };
 
@@ -163,17 +142,8 @@ export default function Evaluator() {
               </h1>
             </section>
 
-            {evaluation && (
-              <section data-tour="evaluator" className="panel space-y-3 p-4">
-                <h2 className="font-semibold">{tr.assistant_evaluation_title}</h2>
-                <p className="text-sm text-muted-foreground">{incoming?.assistantRequest?.user_query}</p>
-                <EvaluationCard data={evaluation} />
-                <Button variant="outline" onClick={() => setEvaluation(undefined)}>{tr.assistant_browse_rules}</Button>
-              </section>
-            )}
-
             {/* Filters */}
-            {!evaluation && <BuildingSelector
+            <BuildingSelector
               tourTarget="evaluator"
               value={building}      onChange={handleFilterChange(setBuilding)}
               area={area}           onAreaChange={handleFilterChange(setArea)}
@@ -182,7 +152,7 @@ export default function Evaluator() {
               occupants={occupants} onOccupantsChange={handleFilterChange(setOccupants)}
               ceilingHeight={ceilingHeight} onCeilingHeightChange={handleFilterChange(setCeilingHeight)}
               volume={volume}       onVolumeChange={handleFilterChange(setVolume)}
-            />}
+            />
 
             {/* Stats + category filter */}
             <section className="flex flex-wrap items-center justify-between gap-3 panel px-4 py-3">
@@ -253,7 +223,7 @@ export default function Evaluator() {
               - Desktop: flex-1 + overflow-y-auto → only this div scrolls
             */}
             <div className="space-y-4 pb-4">
-              {!evaluation && isError && (
+              {isError && (
                 <div className="flex items-center gap-3 rounded-md border border-[hsl(var(--risk-high)/0.4)] bg-[hsl(var(--risk-high)/0.1)] p-4 text-sm text-[hsl(var(--risk-high))]">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   {chrome.evaluator.loadError}

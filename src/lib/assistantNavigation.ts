@@ -1,3 +1,4 @@
+import { evaluatorRequest } from "@/lib/evaluatorRequest";
 import type { NormalizedResponse } from "@/lib/assistantResponse";
 import type { EvaluateRequest } from "@/services/sokolApi";
 
@@ -5,7 +6,7 @@ import type { EvaluateRequest } from "@/services/sokolApi";
 export function assistantDestination(result: NormalizedResponse, request: EvaluateRequest) {
   switch (result.type) {
     case "evaluation":
-      return { path: "/dashboard/evaluator", state: { assistantEvaluation: result.data, assistantRequest: request } };
+      return { path: "/dashboard/evaluator", state: { assistantRequest: evaluatorRequest(request) } };
     case "project_created":
       return { path: result.data.projectId ? `/projects/${encodeURIComponent(result.data.projectId)}` : "/projects" };
     case "electrical_load":

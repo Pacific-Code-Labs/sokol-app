@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface Props {
-  value: BuildingType;
+  value: BuildingType | undefined;
   onChange: (b: BuildingType) => void;
   area: number;
   onAreaChange: (a: number) => void;

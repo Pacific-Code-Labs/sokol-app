@@ -33,12 +33,12 @@ function mount(props = {}) {
   fireEvent.submit(screen.getByPlaceholderText(t.es.askPlaceholder).closest("form")!);
 }
 
-it("opens the evaluator with the actual returned rules and preserves the request and conversation", async () => {
+it("opens the evaluator with the request while preserving the answer in conversation", async () => {
   const close = vi.fn();
   api.evaluate.mockResolvedValue({ type: "evaluation", data: { matchedRules: [{ id: "rule-1", title: "NFPA 13" }], requirements: [], reference: [], contextCr: [], risk: "medio", foundryUsed: true } });
   mount({ close });
   await waitFor(() => expect(screen.getByTestId("destination")).toHaveTextContent("/es/dashboard/evaluator"));
-  expect(screen.getByTestId("result")).toHaveTextContent('"id":"rule-1"');
+  expect(screen.getByTestId("result")).not.toHaveTextContent("assistantEvaluation");
   expect(screen.getByTestId("result")).toHaveTextContent('"area_m2":350');
   expect(screen.getByText("Evalúa mi restaurante")).toBeInTheDocument();
   expect(close).toHaveBeenCalledOnce();
