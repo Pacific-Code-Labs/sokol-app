@@ -39,8 +39,8 @@ export default function Dashboard() {
           <p className="text-sm text-muted-foreground">{name}</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card className="flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium">{tr.total_projects}</CardTitle>
               <FolderKanban className="h-4 w-4 text-muted-foreground" />
@@ -48,6 +48,14 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-3xl font-bold">{loading ? "—" : projects.length}</div>
               <p className="text-xs text-muted-foreground mt-1">{tr.stored_workspace}</p>
+            </CardContent>
+            <CardContent className="mt-auto">
+              <Button asChild variant="outline" className="w-full gap-2">
+                <Link to={localizedPath(lang, "/projects/new")}>
+                  <Plus className="h-4 w-4" />
+                  {tr.new_project}
+                </Link>
+              </Button>
             </CardContent>
           </Card>
 
@@ -66,20 +74,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">{tr.create_project}</CardTitle>
-              <CardDescription>{tr.save_building_data}</CardDescription>
-            </CardHeader>
-            <CardContent className="mt-auto">
-              <Button asChild variant="outline" className="w-full gap-2">
-                <Link to={localizedPath(lang, "/projects/new")}>
-                  <Plus className="h-4 w-4" />
-                  {tr.new_project}
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
         </div>
 
         <Card>
