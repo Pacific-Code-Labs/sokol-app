@@ -293,7 +293,10 @@
       "nav_electrical": "Electrical project",
       "nav_admin": "Administration",
       "nav_roles": "Roles & permissions",
-      "nav_profile": "Profile"
+      "nav_profile": "Profile",
+      "nav_show_sidebar": "Show sidebar",
+      "nav_hide_sidebar": "Hide sidebar",
+      "nav_close_menu": "Close menu"
     },
     "auth": {
       "auth_show_password": "Show password",
@@ -494,7 +497,8 @@
       "roles_matrix_load_error": "Could not load the permission matrix.",
       "roles_matrix_select_all": "Select all",
       "roles_matrix_clear_all": "Clear all",
-      "roles_matrix_selected": "{count} selected"
+      "roles_matrix_selected": "{count} selected",
+      "roles_enterprise_admin_only": "Available only to organization administrators with an active Enterprise plan."
     },
     "rbac": {
       "rbac_module_panel": "Dashboard",
@@ -541,7 +545,8 @@
       "elec_references": "References",
       "elec_disclaimer_note": "Auto-generated preliminary study. A licensed professional (CFIA) must validate the calculations; CFIA does not check the math.",
       "elec_add_load": "Add load",
-      "elec_remove_load": "Remove load",
+      "elec_remove_node": "Remove node",
+  "elec_remove_load": "Remove load",
       "elec_download_diagram": "Download diagram",
       "elec_download_png": "Download PNG",
       "elec_download_svg": "Download SVG",
@@ -586,7 +591,27 @@
       "elec_transformer_short": "transformer",
       "elec_save": "Save project",
       "elec_saved": "Electrical project saved",
-      "elec_save_error": "Could not save the project"
+      "elec_save_error": "Could not save the project",
+      "elec_diagram_preliminary": "Preliminary load diagram. Pending: conductors and raceways, protection and interrupting ratings, grounding, and responsible professional validation under CFIA / NEC 2020.",
+      "elec_export_error": "Could not download the diagram. Please try again.",
+      "elec_conductors": "Conductors: size, material and insulation",
+      "elec_conduit": "Raceway: type and diameter",
+      "elec_protection": "Protection: current and poles",
+      "elec_interrupting_rating": "Interrupting rating / fault current",
+      "elec_grounding": "Grounding and bonding",
+      "elec_pending_validation": "Pending definition and validation",
+      "elec_node_type": "Node type",
+      "elec_add_node": "Add node",
+      "elec_kind_load": "Load",
+      "elec_kind_panel": "Panel",
+      "elec_kind_main_breaker": "Breaker",
+      "elec_kind_spd": "SPD",
+      "elec_kind_grounding": "Grounding",
+      "elec_kind_meter": "Meter",
+      "elec_kind_utility": "Utility service",
+      "elec_feeder_length": "Feeder length (m)",
+      "elec_download": "Download",
+      "elec_download_pdf": "PDF — review document"
     },
     "support": {
       "nav_support": "Support",

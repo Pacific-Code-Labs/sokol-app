@@ -10,7 +10,6 @@ import { sokolApi, BuildingType, RuleCategory } from "@/services/sokolApi";
 import { cn } from "@/lib/utils";
 import { tChrome, fmt } from "@/lib/chrome-i18n";
 import { Printer, ShieldAlert, ListChecks, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
-import { DashboardLayout } from "@/components/DashboardLayout";
 
 const PAGE_SIZE = 20;
 
@@ -103,7 +102,7 @@ export default function Evaluator() {
   };
 
   return (
-    <DashboardLayout>
+    <>
     <div className="flex flex-col scanline">
       {/*
         Mobile:  flex-col, everything stacks, page scrolls normally.
@@ -278,6 +277,6 @@ export default function Evaluator() {
       </main>
 
     </div>
-    </DashboardLayout>
+    </>
   );
 }

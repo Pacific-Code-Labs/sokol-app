@@ -293,7 +293,10 @@
       "nav_electrical": "Proyecto eléctrico",
       "nav_admin": "Administración",
       "nav_roles": "Roles y permisos",
-      "nav_profile": "Perfil"
+      "nav_profile": "Perfil",
+      "nav_show_sidebar": "Mostrar menú lateral",
+      "nav_hide_sidebar": "Ocultar menú lateral",
+      "nav_close_menu": "Cerrar menú"
     },
     "auth": {
       "auth_show_password": "Mostrar contraseña",
@@ -494,7 +497,8 @@
       "roles_matrix_load_error": "No se pudo cargar la matriz de permisos.",
       "roles_matrix_select_all": "Seleccionar todo",
       "roles_matrix_clear_all": "Quitar todo",
-      "roles_matrix_selected": "{count} seleccionados"
+      "roles_matrix_selected": "{count} seleccionados",
+      "roles_enterprise_admin_only": "Disponible únicamente para administradores de organizaciones con un plan Enterprise activo."
     },
     "rbac": {
       "rbac_module_panel": "Panel",
@@ -541,7 +545,8 @@
       "elec_references": "Referencias",
       "elec_disclaimer_note": "Estudio preliminar generado automáticamente. Un profesional con licencia (CFIA) debe validar los cálculos; el CFIA no revisa la matemática.",
       "elec_add_load": "Agregar carga",
-      "elec_remove_load": "Quitar carga",
+      "elec_remove_node": "Eliminar nodo",
+  "elec_remove_load": "Quitar carga",
       "elec_download_diagram": "Descargar diagrama",
       "elec_download_png": "Descargar PNG",
       "elec_download_svg": "Descargar SVG",
@@ -586,7 +591,27 @@
       "elec_transformer_short": "transformador",
       "elec_save": "Guardar proyecto",
       "elec_saved": "Proyecto eléctrico guardado",
-      "elec_save_error": "No se pudo guardar el proyecto"
+      "elec_save_error": "No se pudo guardar el proyecto",
+      "elec_diagram_preliminary": "Diagrama preliminar de cargas. Pendiente: conductores y canalizaciones, protecciones y capacidad interruptiva, puesta a tierra y validación del profesional responsable según CFIA / NEC 2020.",
+      "elec_export_error": "No se pudo descargar el diagrama. Intenta nuevamente.",
+      "elec_conductors": "Conductores: calibre, material y aislamiento",
+      "elec_conduit": "Canalización: tipo y diámetro",
+      "elec_protection": "Protección: corriente y polos",
+      "elec_interrupting_rating": "Capacidad interruptiva / corriente de falla",
+      "elec_grounding": "Puesta a tierra y enlace equipotencial",
+      "elec_pending_validation": "Pendiente de definir y validar",
+      "elec_node_type": "Tipo de nodo",
+      "elec_add_node": "Agregar nodo",
+      "elec_kind_load": "Carga",
+      "elec_kind_panel": "Tablero",
+      "elec_kind_main_breaker": "Interruptor",
+      "elec_kind_spd": "SPD",
+      "elec_kind_grounding": "Puesta a tierra",
+      "elec_kind_meter": "Medidor",
+      "elec_kind_utility": "Acometida",
+      "elec_feeder_length": "Longitud del alimentador (m)",
+      "elec_download": "Descargar",
+      "elec_download_pdf": "PDF — documento para revisión"
     },
     "support": {
       "nav_support": "Soporte",

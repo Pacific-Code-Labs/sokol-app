@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Building2 } from "lucide-react";
 import { Button } from "@pacific-code-labs/sokol-design-system";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { useLang } from "@/contexts/LangContext";
 import { localizedPath } from "@/lib/paths";
 
@@ -19,7 +18,7 @@ export default function NewOrganization() {
   const navigate = useNavigate();
 
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-xl mx-auto text-center py-10">
         <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 border border-primary/30 text-primary">
           <Building2 className="h-6 w-6" />
@@ -31,6 +30,6 @@ export default function NewOrganization() {
           {tr.org_new_continue}
         </Button>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

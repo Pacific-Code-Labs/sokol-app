@@ -17,9 +17,11 @@ import {
   ShieldCheck,
   LayoutGrid,
   Plug,
+  Earth,
   type LucideIcon,
 } from "lucide-react";
 import type { TopologyNodeData, TopologyNodeType } from "@/services/sokolApi";
+import { useLang } from "@/contexts/LangContext";
 import { cn } from "@/lib/utils";
 
 /** Data carried on every React Flow node (mirrors TopologyNode minus id/type). */
@@ -39,6 +41,7 @@ const ICONS: Record<TopologyNodeType, LucideIcon> = {
   spd: ShieldCheck,
   panel: LayoutGrid,
   load: Plug,
+  grounding: Earth,
 };
 
 /** Format a VA value compactly (e.g. 12500 -> "12.5 kVA"). */
@@ -59,11 +62,12 @@ interface ShellProps {
 
 function NodeShell({ kind, data, selected, hasTarget = true, hasSource = true }: ShellProps) {
   const Icon = ICONS[kind];
+  const { tr } = useLang();
   const detail = data.rating ?? formatVa(data.va);
   return (
     <div
       className={cn(
-        "min-w-[140px] max-w-[200px] rounded-lg border bg-card px-3 py-2 text-card-foreground shadow-sm transition-colors",
+        "w-[280px] rounded-lg border bg-card px-3 py-2 text-card-foreground shadow-sm transition-colors",
         selected ? "border-primary ring-2 ring-primary/40" : "border-border",
       )}
       data-node-kind={kind}
@@ -80,7 +84,7 @@ function NodeShell({ kind, data, selected, hasTarget = true, hasSource = true }:
           <Icon className="h-4 w-4" aria-hidden />
         </span>
         <div className="min-w-0">
-          <div className="truncate text-xs font-semibold leading-tight">{data.label}</div>
+          <div className="break-words text-xs font-semibold leading-tight">{data.label}</div>
           {detail && (
             <div className="truncate text-[10px] text-muted-foreground">{detail}</div>
           )}
@@ -91,6 +95,14 @@ function NodeShell({ kind, data, selected, hasTarget = true, hasSource = true }:
           {data.phase}
         </div>
       )}
+      <dl className="mt-2 space-y-1 border-t border-border pt-2 text-[10px]">
+        {(kind === "grounding" ? [[tr.elec_grounding, data.grounding]] : [
+          [tr.elec_conductors, data.conductors], [tr.elec_conduit, data.conduit], [tr.elec_feeder_length, data.feederLength],
+          [tr.elec_protection, data.protection], [tr.elec_interrupting_rating, data.interruptingRating],
+          [tr.elec_grounding, data.grounding],
+        ]).map(([label, value]) => <div key={label}><dt className="text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value || tr.elec_pending_validation}</dd></div>)}
+      </dl>
+      {data.note && <p className="mt-2 break-words text-[10px] text-muted-foreground">{data.note}</p>}
       {hasSource && (
         <Handle
           type="source"
@@ -133,6 +145,8 @@ const LoadNode = memo((p: NodeProps<ElectricalRFNode>) => (
 LoadNode.displayName = "LoadNode";
 
 /** nodeTypes map for ReactFlow — keys match TopologyNodeType. */
+const GroundingNode = memo((p: NodeProps<ElectricalRFNode>) => <NodeShell kind="grounding" data={p.data} selected={p.selected} hasSource={false} />);
+
 export const electricalNodeTypes = {
   utility: UtilityNode,
   meter: MeterNode,
@@ -140,4 +154,5 @@ export const electricalNodeTypes = {
   spd: SpdNode,
   panel: PanelNode,
   load: LoadNode,
+  grounding: GroundingNode,
 } as const;

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Badge, ListSkeleton, type BadgeProps } from "@pacific-code-labs/sokol-design-system";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/contexts/LangContext";
 import { useSupportTickets } from "@/hooks/useSupport";
@@ -23,7 +22,7 @@ export default function SupportList() {
   const tickets = useSupportTickets();
 
   return (
-    <DashboardLayout>
+    <>
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -65,6 +64,6 @@ export default function SupportList() {
           </ul>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

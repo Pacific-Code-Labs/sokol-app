@@ -69,7 +69,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-[100dvh] bg-background">
-      <Header />
+      {!user && <Header />}
       <main className="container py-12">
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-3xl font-bold tracking-tight">{tr.pricing_title}</h1>

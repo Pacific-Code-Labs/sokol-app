@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Loader2, Paperclip } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Badge, cn, DetailSkeleton } from "@pacific-code-labs/sokol-design-system";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
@@ -43,7 +42,7 @@ export default function SupportDetail() {
   const tk = ticket.data;
 
   return (
-    <DashboardLayout>
+    <>
       <div className="mx-auto max-w-3xl space-y-4">
         <Link to={localizedPath(lang, "/support")} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> {pickLang(content.title, lang)}
@@ -149,6 +148,6 @@ export default function SupportDetail() {
           </>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

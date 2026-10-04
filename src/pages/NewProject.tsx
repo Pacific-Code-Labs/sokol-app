@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { useProjects } from "@/hooks/useProjects";
 import { useLang } from "@/contexts/LangContext";
 import { Button } from "@/components/ui/button";
@@ -104,7 +103,7 @@ export default function NewProject() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-2xl space-y-4">
         <Button asChild variant="ghost" size="sm" className="gap-1 -ml-2">
           <Link to={localizedPath(lang, "/projects")}><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
@@ -177,6 +176,6 @@ export default function NewProject() {
         </Card>
       </div>
       <UpgradeModal quota={quota} onClose={() => setQuota(null)} />
-    </DashboardLayout>
+    </>
   );
 }

@@ -9,8 +9,8 @@ import { MarkerType, type Edge } from "@xyflow/react";
 import type { Topology, TopologyNode } from "@/services/sokolApi";
 import type { ElectricalRFNode } from "./electricalNodes";
 
-const NODE_W = 180;
-const NODE_H = 64;
+const NODE_W = 280;
+const NODE_H = 250;
 
 /** Map a wire TopologyNode to a React Flow node (type = its topology kind). */
 export function toRFNode(n: TopologyNode): ElectricalRFNode {
@@ -19,6 +19,7 @@ export function toRFNode(n: TopologyNode): ElectricalRFNode {
     type: n.type,
     position: { x: 0, y: 0 },
     data: {
+      ...n.data,
       label: n.label,
       kind: n.type,
       va: n.data?.va,
@@ -80,6 +81,12 @@ export function flowToTopology(nodes: ElectricalRFNode[], edges: Edge[]): Topolo
       type: n.data.kind,
       label: n.data.label,
       data: {
+        conductors: n.data.conductors,
+        conduit: n.data.conduit,
+        feederLength: n.data.feederLength,
+        protection: n.data.protection,
+        interruptingRating: n.data.interruptingRating,
+        grounding: n.data.grounding,
         va: n.data.va,
         rating: n.data.rating,
         phase: n.data.phase,

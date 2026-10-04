@@ -3,7 +3,6 @@ import { useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
@@ -69,7 +68,7 @@ export default function SupportNew() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="mx-auto max-w-2xl space-y-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{tr.support_new}</h1>
@@ -111,6 +110,6 @@ export default function SupportNew() {
           </Button>
         </form>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

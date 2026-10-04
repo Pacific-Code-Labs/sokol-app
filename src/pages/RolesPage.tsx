@@ -5,7 +5,6 @@ import { useMe } from "@/hooks/useMe";
 import { useDeleteRole, useOrgRoles, usePermissions } from "@/hooks/useRbac";
 import { RoleInUseError } from "@/services/rbacApi";
 import { RoleDrawerForm } from "@/components/roles/RoleDrawerForm";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { roleDescription, roleLabel } from "@/lib/rbacI18n";
 import type { RoleDto } from "@/types/rbac";
 
@@ -30,11 +29,12 @@ const DRAWER_CLOSED: DrawerState = {
  * once usePermissions is ready (fail-open during the RBAC log rollout).
  */
 export default function RolesPage() {
-  const { userId, organizationId: orgId } = useMe();
+  const { userId, organizationId: orgId, tier, isLoading } = useMe();
   const { tr } = useLang();
 
-  const { can, isReady } = usePermissions();
-  const rolesQuery = useOrgRoles(userId, orgId);
+  const { can, isReady, isAdmin, isOwner } = usePermissions();
+  const eligible = tier === "enterprise" && isReady && (isAdmin || isOwner);
+  const rolesQuery = useOrgRoles(eligible ? userId : undefined, eligible ? orgId : undefined);
   const deleteRole = useDeleteRole();
 
   const [drawer, setDrawer] = useState<DrawerState>(DRAWER_CLOSED);
@@ -87,17 +87,18 @@ export default function RolesPage() {
 
   // Route gating — only enforced once my-permissions resolves (fail-open during
   // the RBAC log rollout).
-  if (isReady && !canRead) {
+  if (isLoading || (!isReady && tier === "enterprise")) return <p className="p-8 text-muted-foreground">{tr.loading}</p>;
+  if (!eligible || !canRead) {
     return (
-      <DashboardLayout>
+      <>
         <Card className="p-8 text-center max-w-md mx-auto mt-10">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
             <Icon name="lock" size={20} className="text-muted-foreground" />
           </div>
           <h2 className="text-lg font-bold mb-1">{tr.roles_no_access_title}</h2>
-          <p className="text-sm text-muted-foreground">{tr.roles_no_access_description}</p>
+          <p className="text-sm text-muted-foreground">{tr.roles_enterprise_admin_only}</p>
         </Card>
-      </DashboardLayout>
+      </>
     );
   }
 
@@ -189,7 +190,7 @@ export default function RolesPage() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-[1100px] mx-auto">
         {/* Header */}
         <div className="flex justify-between items-start mb-7 flex-wrap gap-3">
@@ -299,6 +300,6 @@ export default function RolesPage() {
           }}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }

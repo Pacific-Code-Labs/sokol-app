@@ -15,7 +15,6 @@ import {
   Input,
 } from "@pacific-code-labs/sokol-design-system";
 import { toast } from "sonner";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import { PasswordField } from "@/components/auth/PasswordField";
@@ -106,7 +105,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-[1100px] mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 border border-primary/30 text-primary">
@@ -260,7 +259,7 @@ export default function ProfilePage() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }
 

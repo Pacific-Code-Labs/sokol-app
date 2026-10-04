@@ -23,7 +23,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { BillingProvider } from "@/contexts/BillingContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AssistantProvider } from "@/contexts/AssistantContext";
-import { RequireAuth } from "@/components/RequireAuth";
+import { ProductLayout } from "@/components/ProductLayout";
+import { PageTransition } from "@/components/PageTransition";
+import { Outlet } from "react-router-dom";
 import { LangLayout } from "@/components/LangLayout";
 import { DEFAULT_LANG, isLang, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
 import { landingHref } from "@/lib/site-links";
@@ -79,25 +81,29 @@ const App = () => (
                 <Route path="/:lang" element={<LangLayout />}>
                   <Route index element={<Navigate to="dashboard" replace />} />
                   <Route path="demo" element={<DemoRedirect />} />
+                  <Route element={<PageTransition><Outlet /></PageTransition>}>
                   <Route path="login" element={<Login />} />
                   <Route path="register" element={<Register />} />
                   <Route path="verify-email" element={<VerifyEmail />} />
                   <Route path="forgot-password" element={<ForgotPassword />} />
                   <Route path="reset-password" element={<ResetPassword />} />
-                  <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                  <Route path="dashboard/evaluator" element={<RequireAuth><Evaluator /></RequireAuth>} />
-                  <Route path="dashboard/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-                  <Route path="dashboard/roles" element={<RequireAuth><RolesPage /></RequireAuth>} />
-                  <Route path="organizations/new" element={<RequireAuth><NewOrganization /></RequireAuth>} />
-                  <Route path="demo-project" element={<RequireAuth><DemoProject /></RequireAuth>} />
-                  <Route path="projects" element={<RequireAuth><Projects /></RequireAuth>} />
-                  <Route path="projects/new" element={<RequireAuth><NewProject /></RequireAuth>} />
-                  <Route path="projects/electrical" element={<RequireAuth><ElectricalProject /></RequireAuth>} />
-                  <Route path="projects/:id" element={<RequireAuth><ProjectDetail /></RequireAuth>} />
-                  <Route path="support" element={<RequireAuth><SupportList /></RequireAuth>} />
-                  <Route path="support/new" element={<RequireAuth><SupportNew /></RequireAuth>} />
-                  <Route path="support/:id" element={<RequireAuth><SupportDetail /></RequireAuth>} />
+                  </Route>
+                  <Route element={<ProductLayout />}>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="dashboard/evaluator" element={<Evaluator />} />
+                  <Route path="dashboard/profile" element={<ProfilePage />} />
+                  <Route path="dashboard/roles" element={<RolesPage />} />
+                  <Route path="organizations/new" element={<NewOrganization />} />
+                  <Route path="demo-project" element={<DemoProject />} />
+                  <Route path="projects" element={<Projects />} />
+                  <Route path="projects/new" element={<NewProject />} />
+                  <Route path="projects/electrical" element={<ElectricalProject />} />
+                  <Route path="projects/:id" element={<ProjectDetail />} />
+                  <Route path="support" element={<SupportList />} />
+                  <Route path="support/new" element={<SupportNew />} />
+                  <Route path="support/:id" element={<SupportDetail />} />
                   <Route path="pricing" element={<Pricing />} />
+                  </Route>
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Route>

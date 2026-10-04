@@ -358,11 +358,18 @@ export type TopologyNodeType =
   | "main_breaker"
   | "spd"
   | "panel"
-  | "load";
+  | "load"
+  | "grounding";
 
 export type TopologyPhase = "A" | "B" | "C" | "ABC";
 
 export interface TopologyNodeData {
+  conductors?: string;
+  conduit?: string;
+  feederLength?: string;
+  protection?: string;
+  interruptingRating?: string;
+  grounding?: string;
   va?: number;
   rating?: string;
   phase?: TopologyPhase;
@@ -410,6 +417,7 @@ export interface PhaseBalanceEntry {
 }
 
 export interface ElectricalLoadData {
+  projectId?: string;
   occupancy: string;
   serviceType: string;
   installedVa: number;

@@ -172,6 +172,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   // FCR-100 guided-demo state (refs avoid re-render churn / setState races).
   const demoNextRef = useAssistantRuntimeRef<PromptKind | null>("demoNextRef", null);
   const activeScenarioRef = useAssistantRuntimeRef<DemoScenario | null>("activeScenarioRef", null);
+  const lastRequestRef = useAssistantRuntimeRef<string>("lastRequestRef", "");
   const activeQueryRef = useAssistantRuntimeRef<string>("activeQueryRef", "");
   const demoEndedRef = useAssistantRuntimeRef<boolean>("demoEndedRef", false);
   const projectReofferedRef = useAssistantRuntimeRef<boolean>("projectReofferedRef", false); // FCR-115: re-offer the project once on decline
@@ -248,13 +249,15 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         // (conversational), then resend the collected answers.
         const qs = norm.data.questions ?? [];
         if (qs.length > 0) {
+          const originalQuery = lastRequestRef.current;
           startQuestionFlow(qs, (summary) =>
-            ask(summary, { overrides: activeScenarioRef.current?.params }),
+            ask(`${originalQuery}\n${summary}`, { overrides: activeScenarioRef.current?.params }),
           );
         }
         break;
       }
       case "electrical_load": {
+        if (norm.data.projectId) void queryClient.invalidateQueries({ queryKey: ["projects"] });
         const summary = fmt(tr.chat_load_study, {
           kva: norm.data.demandKva?.toLocaleString?.() ?? norm.data.demandKva,
         });
@@ -353,6 +356,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
    */
   const ask = async (text: string, opts: AskOptions = {}) => {
     if (!text.trim() || isLoading) return;
+    lastRequestRef.current = text;
     const { overrides, teaser, demoNext, demoStep, silent } = opts;
     if (demoNext !== undefined) demoNextRef.current = demoNext;
 

@@ -3,7 +3,6 @@ import { Navigate, Outlet, useLocation, useNavigate, useParams } from "react-rou
 import { useLang } from "@/contexts/LangContext";
 import { DEFAULT_LANG, isLang, stripLangPrefix } from "@/lib/paths";
 import { resolveSeo, useHeadTags } from "@/lib/seo";
-import { PageTransition } from "@/components/PageTransition";
 
 /**
  * Shell for the /:lang/* routes. Validates the :lang segment, syncs the
@@ -40,11 +39,7 @@ export function LangLayout() {
     return <Navigate to={"/" + DEFAULT_LANG + stripLangPrefix(location.pathname).rest} replace />;
   }
 
-  return (
-    <PageTransition>
-      <Outlet />
-    </PageTransition>
-  );
+  return <Outlet />;
 }
 
 export default LangLayout;

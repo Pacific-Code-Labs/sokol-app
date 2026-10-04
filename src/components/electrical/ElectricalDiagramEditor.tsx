@@ -10,7 +10,7 @@ import { Select } from "@pacific-code-labs/sokol-design-system";
  * onChange so the parent can update the load table / kVA.
  *
  * Initial layout is computed with @dagrejs/dagre (top-down). A Download
- * SVG/PNG export uses html-to-image against the React Flow viewport.
+ * PDF/PNG/SVG export renders the full graph as native vectors.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -23,15 +23,15 @@ import {
   addEdge,
   useNodesState,
   useEdgesState,
-  getNodesBounds,
-  getViewportForBounds,
   type Connection,
   type Edge,
   type OnSelectionChangeParams,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { toPng, toSvg } from "html-to-image";
-import { Plus, Trash2, LayoutDashboard, Loader2, ImageDown, FileDown } from "lucide-react";
+import { DiagramDownloadMenu, type DiagramFormat } from "./DiagramDownloadMenu";
+import { downloadDiagram } from "./downloadDiagram";
+import { toast } from "sonner";
+import { Plus, Trash2, LayoutDashboard, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
@@ -41,6 +41,7 @@ import {
   type ElectricalLoadData,
   type Topology,
   type TopologyPhase,
+  type TopologyNodeType,
 } from "@/services/sokolApi";
 import { electricalNodeTypes, type ElectricalRFNode } from "./electricalNodes";
 import { topologyToFlow, flowToTopology, layoutNodes } from "./topologyLayout";
@@ -74,8 +75,10 @@ function EditorInner({ value, onChange }: Props) {
   const initial = useMemo(() => topologyToFlow(value.topology), [value.topology]);
   const [nodes, setNodes, onNodesChange] = useNodesState<ElectricalRFNode>(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initial.edges);
+  const [newKind, setNewKind] = useState<TopologyNodeType>("load");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Keep stable refs so the debounced recalc always reads current graph state.
@@ -87,6 +90,17 @@ function EditorInner({ value, onChange }: Props) {
   onChangeRef.current = onChange;
   const inputsRef = useRef(value.inputs);
   inputsRef.current = value.inputs;
+
+  // Persisted custom loads already appear in inputs.other. Remove one matching
+  // entry per canvas load, then retain all remaining mapped project loads.
+  const [mappedOther] = useState(() => {
+    const remaining = [...(value.inputs.special_loads?.other ?? [])];
+    for (const node of initial.nodes.filter(n => n.id.startsWith("load-custom-"))) {
+      const index = remaining.findIndex(load => load.name === node.data.label && load.va === node.data.va);
+      if (index >= 0) remaining.splice(index, 1);
+    }
+    return remaining;
+  });
 
   const recalc = useCallback(() => {
     const topology = flowToTopology(nodesRef.current, edgesRef.current);
@@ -101,7 +115,7 @@ function EditorInner({ value, onChange }: Props) {
       .map((n) => ({ name: n.data?.label ?? "Load", va: Number(n.data?.va) || 0 }));
     const inputs: ElectricalInputs = {
       ...base,
-      special_loads: { ...(base.special_loads ?? {}), other: customOther },
+      special_loads: { ...(base.special_loads ?? {}), other: [...mappedOther, ...customOther] },
     };
     setIsCalculating(true);
     sokolApi
@@ -109,7 +123,7 @@ function EditorInner({ value, onChange }: Props) {
       .then((result) => onChangeRef.current({ inputs, topology, result }))
       .catch((error) => onChangeRef.current({ inputs, topology, error }))
       .finally(() => setIsCalculating(false));
-  }, []);
+  }, [mappedOther]);
 
   /** Schedule a debounced recalculation after any graph mutation. */
   const scheduleRecalc = useCallback(() => {
@@ -167,16 +181,16 @@ function EditorInner({ value, onChange }: Props) {
 
   /** Add a new load node wired to the first panel (or the last node). */
   const addLoad = useCallback(() => {
-    const id = `load-custom-${Date.now().toString(36)}`;
+    const id = `${newKind}-custom-${crypto.randomUUID()}`;
     const panel = nodesRef.current.find((n) => n.data.kind === "panel");
     const anchor = panel ?? nodesRef.current[nodesRef.current.length - 1];
     const newNode: ElectricalRFNode = {
       id,
-      type: "load",
+      type: newKind,
       position: anchor
         ? { x: anchor.position.x + 220, y: anchor.position.y + 120 }
         : { x: 0, y: 0 },
-      data: { label: tr.elec_new_load, kind: "load", va: 1500, phase: "A" },
+      data: { label: newKind === "load" ? tr.elec_new_load : tr[`elec_kind_${newKind}`], kind: newKind, ...(newKind === "load" ? { va: 1500, phase: "A" as const } : {}) },
     };
     setNodes((ns) => [...ns, newNode]);
     if (anchor) {
@@ -187,11 +201,11 @@ function EditorInner({ value, onChange }: Props) {
     }
     setSelectedId(id);
     scheduleRecalc();
-  }, [setNodes, setEdges, scheduleRecalc, tr.elec_new_load]);
+  }, [setNodes, setEdges, scheduleRecalc, tr, newKind]);
 
   /** Remove the selected node (only loads are removable) + its edges. */
   const removeSelected = useCallback(() => {
-    if (!selectedNode || selectedNode.data.kind !== "load") return;
+    if (!selectedNode || !selectedNode.id.includes("-custom-")) return;
     const id = selectedNode.id;
     setNodes((ns) => ns.filter((n) => n.id !== id));
     setEdges((eds) => eds.filter((e) => e.source !== id && e.target !== id));
@@ -205,35 +219,43 @@ function EditorInner({ value, onChange }: Props) {
   }, [setNodes]);
 
   const exportImage = useCallback(
-    async (format: "png" | "svg") => {
-      const viewport = flowRef.current?.querySelector<HTMLElement>(".react-flow__viewport");
-      if (!viewport) return;
-      const bounds = getNodesBounds(nodesRef.current);
-      const width = Math.max(bounds.width + 80, 320);
-      const height = Math.max(bounds.height + 80, 240);
-      const { x, y, zoom } = getViewportForBounds(bounds, width, height, 0.5, 2, 0.1);
-      const opts = {
-        backgroundColor: "transparent",
-        width,
-        height,
-        style: {
-          width: `${width}px`,
-          height: `${height}px`,
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
-      };
-      const dataUrl = format === "png" ? await toPng(viewport, opts) : await toSvg(viewport, opts);
-      const a = document.createElement("a");
-      a.setAttribute("download", `single-line-diagram.${format}`);
-      a.setAttribute("href", dataUrl);
-      a.click();
+    async (format: DiagramFormat) => {
+      if (!flowRef.current || nodesRef.current.length === 0) return;
+      setExporting(true);
+      try {
+        await downloadDiagram(flowRef.current, nodesRef.current, format, tr.elec_diagram_preliminary, { conductors: tr.elec_conductors, conduit: tr.elec_conduit, feederLength: tr.elec_feeder_length, protection: tr.elec_protection, interruptingRating: tr.elec_interrupting_rating, grounding: tr.elec_grounding, pending: tr.elec_pending_validation, title: tr.elec_single_line }, edgesRef.current);
+      } catch {
+        toast.error(tr.elec_export_error);
+      } finally { setExporting(false); }
     },
-    [],
+    [tr],
   );
 
   return (
     <div className="flex h-full min-h-[420px] w-full flex-col gap-3 md:flex-row">
-      <div ref={flowRef} className="relative h-full min-h-[420px] flex-1 overflow-hidden rounded-lg border border-border">
+      <div ref={flowRef} className="relative flex h-[560px] min-h-[420px] flex-1 flex-col overflow-hidden rounded-lg border border-border">
+          <div className="relative z-10 flex flex-wrap gap-1.5 border-b border-border bg-card p-2">
+            <Select aria-label={tr.elec_node_type} value={newKind} onChange={e => setNewKind(e.target.value as TopologyNodeType)} className="h-8 max-w-44">
+              {(["load", "panel", "main_breaker", "spd", "grounding", "meter", "utility"] as const).map(kind => <option key={kind} value={kind}>{tr[`elec_kind_${kind}`]}</option>)}
+            </Select>
+            <Button type="button" size="sm" variant="secondary" onClick={addLoad}>
+              <Plus className="mr-1 h-3.5 w-3.5" /> {tr.elec_add_node}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={removeSelected}
+              disabled={!selectedNode || !selectedNode.id.includes("-custom-")}
+            >
+              <Trash2 className="mr-1 h-3.5 w-3.5" /> {tr.elec_remove_node}
+            </Button>
+            <Button type="button" size="sm" variant="secondary" onClick={relayout}>
+              <LayoutDashboard className="mr-1 h-3.5 w-3.5" /> {tr.elec_auto_layout}
+            </Button>
+            <DiagramDownloadMenu busy={exporting} disabled={!nodes.length} onDownload={exportImage} />
+          </div>
+        <div className="min-h-0 flex-1">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -244,41 +266,21 @@ function EditorInner({ value, onChange }: Props) {
           onSelectionChange={onSelectionChange}
           onNodeDragStop={scheduleRecalc}
           defaultEdgeOptions={{ type: "step" }}
+          minZoom={0.1}
+          fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
           fitView
           proOptions={{ hideAttribution: true }}
         >
           <Background />
           <Controls />
           <MiniMap pannable zoomable className="!hidden sm:!block" />
-          <Panel position="top-left" className="flex flex-wrap gap-1.5">
-            <Button type="button" size="sm" variant="secondary" onClick={addLoad}>
-              <Plus className="mr-1 h-3.5 w-3.5" /> {tr.elec_add_load}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={removeSelected}
-              disabled={!selectedNode || selectedNode.data.kind !== "load"}
-            >
-              <Trash2 className="mr-1 h-3.5 w-3.5" /> {tr.elec_remove_load}
-            </Button>
-            <Button type="button" size="sm" variant="secondary" onClick={relayout}>
-              <LayoutDashboard className="mr-1 h-3.5 w-3.5" /> {tr.elec_auto_layout}
-            </Button>
-            <Button type="button" size="sm" variant="secondary" onClick={() => exportImage("png")}>
-              <ImageDown className="mr-1 h-3.5 w-3.5" /> {tr.elec_download_png}
-            </Button>
-            <Button type="button" size="sm" variant="secondary" onClick={() => exportImage("svg")}>
-              <FileDown className="mr-1 h-3.5 w-3.5" /> {tr.elec_download_svg}
-            </Button>
-          </Panel>
           {isCalculating && (
             <Panel position="top-right" className="flex items-center gap-1.5 rounded-md border border-border bg-card/90 px-2 py-1 text-xs text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> {tr.elec_recalculating}
             </Panel>
           )}
         </ReactFlow>
+        </div>
       </div>
 
       {/* On-select edit panel — stacks below the canvas on mobile/tablet. */}
@@ -332,6 +334,10 @@ function EditorInner({ value, onChange }: Props) {
                 ))}
               </Select>
             </label>
+            {(["conductors", "conduit", "feederLength", "protection", "interruptingRating", "grounding"] as const).map(field => <label key={field} className="block space-y-1 text-[11px] text-muted-foreground">
+              {tr[({ conductors: "elec_conductors", conduit: "elec_conduit", feederLength: "elec_feeder_length", protection: "elec_protection", interruptingRating: "elec_interrupting_rating", grounding: "elec_grounding" } as const)[field]]}
+              <Input value={selectedNode.data[field] ?? ""} placeholder={tr.elec_pending_validation} maxLength={250} onChange={e => patchSelected({ [field]: e.target.value || undefined })} className="h-8 text-xs" />
+            </label>)}
             <label className="block space-y-1 text-[11px] text-muted-foreground">
               {tr.elec_node_note}
               <Input

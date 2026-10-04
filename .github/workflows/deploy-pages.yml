@@ -41,6 +41,8 @@ jobs:
       - name: Load web config from SSM (/sokol/dev/web)
         run: bash scripts/load-env-from-ssm.sh dev - --github-env
 
+      - run: pnpm test
+
       # i18n + hard-coded-text checks, typecheck, vite build, SPA 404 fallback
       - run: pnpm build
 

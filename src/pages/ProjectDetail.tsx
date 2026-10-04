@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { useProject } from "@/hooks/useProjects";
 import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
@@ -78,7 +77,7 @@ export default function ProjectDetail() {
   }, [id, project]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-4">
         <Button asChild variant="ghost" size="sm" className="gap-1 -ml-2">
           <Link to={localizedPath(lang, "/projects")}><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
@@ -180,6 +179,6 @@ export default function ProjectDetail() {
           </>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 }

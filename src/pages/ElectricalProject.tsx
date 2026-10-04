@@ -14,9 +14,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Save, Zap } from "lucide-react";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAssistant } from "@/contexts/AssistantContext";
 import { useLang } from "@/contexts/LangContext";
 import { useProject } from "@/hooks/useProjects";
 import {
@@ -45,6 +45,7 @@ function toBuildingType(occupancy: string): ProjectBuildingType {
 export default function ElectricalProject() {
   const { lang, tr } = useLang();
   const navigate = useNavigate();
+  const { setPageContext, setInput } = useAssistant();
   // FCR-118: edit round-trip — `?projectId=<id>` loads a saved study to edit in
   // place (PUT) instead of creating a new project on save.
   const [searchParams] = useSearchParams();
@@ -96,9 +97,10 @@ export default function ElectricalProject() {
     if (snap?.result) {
       setInputs({ ...snap.inputs, language: lang });
       setName(editProject.name ?? "");
-      setSeed(snap.result);
+      const topology = snap.topology?.nodes.length ? snap.topology : snap.result.topology;
+      setSeed({ ...snap.result, topology });
       setResult(snap.result);
-      setSnapshotTopology(snap.topology ?? EMPTY_TOPOLOGY);
+      setSnapshotTopology(topology);
     } else {
       sokolApi
         .postElectricalPreliminary({ inputs })
@@ -111,6 +113,11 @@ export default function ElectricalProject() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId, seeded, editProject, lang]);
+
+  useEffect(() => {
+    setPageContext(editProject ? { page: "project_detail", payload: { project: editProject } } : { page: "other" });
+    setInput({ areaM2: inputs.area_m2, floors: inputs.floors });
+  }, [editProject, inputs.area_m2, inputs.floors, setPageContext, setInput]);
 
   const editorValue = useMemo(
     () => ({ inputs, topology: seed?.topology ?? EMPTY_TOPOLOGY }),
@@ -155,7 +162,7 @@ export default function ElectricalProject() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-4">
         <Button asChild variant="ghost" size="sm" className="gap-1 -ml-2">
           <Link to={localizedPath(lang, "/projects")}><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
@@ -242,7 +249,8 @@ export default function ElectricalProject() {
           {seed ? (
             <ElectricalDiagramEditor
               value={editorValue}
-              onChange={({ topology, result: r }) => {
+              onChange={({ topology, inputs: updatedInputs, result: r }) => {
+                setInputs(updatedInputs);
                 if (r) setResult(r);
                 setSnapshotTopology(topology);
               }}
@@ -277,7 +285,7 @@ export default function ElectricalProject() {
           </Button>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }
 

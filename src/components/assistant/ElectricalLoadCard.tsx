@@ -5,7 +5,7 @@
  * schedule table, a recharts phase-balance bar chart, a mandated-provisions
  * checklist, assumptions / references, and the disclaimer. Bilingual via useLang.
  */
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -29,6 +29,10 @@ import type { ElectricalLoadData } from "@/lib/assistantResponse";
 import { electricalNodeTypes, type ElectricalRFNode } from "@/components/electrical/electricalNodes";
 import { topologyToFlow } from "@/components/electrical/topologyLayout";
 
+import { DiagramDownloadMenu, type DiagramFormat } from "@/components/electrical/DiagramDownloadMenu";
+import { downloadDiagram } from "@/components/electrical/downloadDiagram";
+import { toast } from "sonner";
+
 interface Props {
   data: ElectricalLoadData;
 }
@@ -46,8 +50,19 @@ const PHASE_COLORS = [
 ];
 
 function Diagram({ nodes, edges }: { nodes: ElectricalRFNode[]; edges: Edge[] }) {
-  return (
-    <div className="h-56 w-full overflow-hidden rounded-md border border-border bg-background/40">
+  const ref = useRef<HTMLDivElement>(null);
+  const { tr } = useLang();
+  const [busy, setBusy] = useState(false);
+  const download = async (format: DiagramFormat) => {
+    if (!ref.current) return;
+    setBusy(true);
+    try { await downloadDiagram(ref.current, nodes, format, tr.elec_diagram_preliminary, { conductors: tr.elec_conductors, conduit: tr.elec_conduit, feederLength: tr.elec_feeder_length, protection: tr.elec_protection, interruptingRating: tr.elec_interrupting_rating, grounding: tr.elec_grounding, pending: tr.elec_pending_validation, title: tr.elec_single_line }, edges); }
+    catch { toast.error(tr.elec_export_error); }
+    finally { setBusy(false); }
+  };
+  return <div className="space-y-2">
+    <DiagramDownloadMenu busy={busy} onDownload={download} />
+    <div ref={ref} className="h-56 w-full overflow-hidden rounded-md border border-border bg-background/40">
       <ReactFlowProvider>
         <ReactFlow
           nodes={nodes}
@@ -58,6 +73,8 @@ function Diagram({ nodes, edges }: { nodes: ElectricalRFNode[]; edges: Edge[] })
           elementsSelectable={false}
           panOnDrag
           zoomOnScroll={false}
+          minZoom={0.05}
+          fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
           fitView
           proOptions={{ hideAttribution: true }}
         >
@@ -65,7 +82,7 @@ function Diagram({ nodes, edges }: { nodes: ElectricalRFNode[]; edges: Edge[] })
         </ReactFlow>
       </ReactFlowProvider>
     </div>
-  );
+  </div>;
 }
 
 export function ElectricalLoadCard({ data }: Props) {
@@ -81,6 +98,8 @@ export function ElectricalLoadCard({ data }: Props) {
       <div className="flex items-center gap-2 text-sm font-semibold text-accent">
         <Zap className="h-4 w-4" /> {tr.elec_title}
       </div>
+
+      <p className="rounded-md border border-border bg-muted p-3 text-xs text-muted-foreground">{tr.elec_diagram_preliminary}</p>
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3 md:grid-cols-4">
