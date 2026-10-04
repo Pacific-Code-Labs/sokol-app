@@ -44,7 +44,7 @@ export function UpgradeModal({ quota, onClose }: Props) {
     : tr.upgrade_generic_desc;
 
   const usageLine =
-    payload && typeof payload.current === "number"
+    payload && payload.unit !== "tokens" && typeof payload.current === "number"
       ? fill(tr.upgrade_current_usage, { current: payload.current, limit })
       : null;
 

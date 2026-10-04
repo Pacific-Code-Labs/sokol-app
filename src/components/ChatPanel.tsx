@@ -413,6 +413,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       if (err instanceof DemoLimitError) {
         handleDemoLimit(err.payload);
       } else if (err instanceof QuotaError) {
+        setMessages((current) => [...current, { role: "assistant", type: "message", text: err.kind === "saved_projects" ? tr.chat_project_quota_blocked : tr.chat_usage_quota_blocked }]);
         setQuota(err);
       } else {
         handleError(err);

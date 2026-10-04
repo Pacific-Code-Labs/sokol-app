@@ -10,6 +10,7 @@ import { useMe } from "@/hooks/useMe";
 import { useRealtimeEvents } from "@/hooks/useRealtimeEvents";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AppTutorial } from "@/components/AppTutorial";
 import { GlobalAssistant } from "@/components/GlobalAssistant";
 import { PageTransition } from "@/components/PageTransition";
 import { localizedPath, stripLangPrefix } from "@/lib/paths";
@@ -52,7 +53,7 @@ export function DashboardLayout() {
           <button type="button" onClick={openMenu} aria-label={tr.nav_show_sidebar} className="rounded-md p-2 text-muted-foreground hover:bg-muted lg:hidden"><Menu className="h-5 w-5" /></button>
           <h1 className="truncate text-sm font-semibold">{title}</h1>
         </div>
-        <div className="flex items-center gap-2"><ThemeToggle /><LanguageToggle /></div>
+        <div className="flex items-center gap-2">{user && <AppTutorial key={user.userId} userId={user.userId} ready={permissions.isReady} dashboard={visible("panel", "overview")} projects={visible("projects", "projects")} evaluator={visible("projects", "evaluator")} />}<ThemeToggle /><LanguageToggle /></div>
       </header>}
       footer={() => <div className="space-y-1">
         <button type="button" onClick={() => navigate(localizedPath(lang, "/dashboard/profile"))} className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left hover:bg-sidebar-accent ${rest === "/dashboard/profile" ? "bg-primary/10 text-primary" : "text-sidebar-foreground"}`}>
