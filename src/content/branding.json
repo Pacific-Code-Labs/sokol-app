@@ -2,15 +2,15 @@
   "companyName": "Sóköl",
   "companySuffix": "",
   "logoIconName": "flame",
-  "logoUrl": "",
-  "logoUrlDark": "",
-  "markUrl": "",
-  "faviconUrl": "/favicon.ico",
+  "logoUrl": "/brand/sokol_l1_primary.svg",
+  "logoUrlDark": "/brand/sokol_l2_reverse.svg",
+  "markUrl": "/brand/sokol_l3_symbol.svg",
+  "faviconUrl": "/favicon.svg",
   "appleTouchIconUrl": "/apple-touch-icon.png",
-  "ogImage": "/og-image.png",
+  "ogImage": "/brand/social-card-es.png",
   "socialCardUrl": {
-    "es": "",
-    "en": ""
+    "es": "/brand/social-card-es.png",
+    "en": "/brand/social-card-en.png"
   },
   "tagline": {
     "es": "Asistente NFPA para Costa Rica",

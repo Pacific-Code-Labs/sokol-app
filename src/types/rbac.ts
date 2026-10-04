@@ -22,6 +22,7 @@ export interface MeResponse {
   role: string | null;
   /** Org subscription tier: free | pro | enterprise. */
   tier: string;
+  usage?: { plan?: { name_es: string; name_en: string; description_es: string; description_en: string }; unit: "tokens"; used: number; limit: number; remaining: number; reset: string; maxSavedProjects: number | null; seats: number };
 }
 
 /** A role row (system template or org custom role) — RoleResponse. */

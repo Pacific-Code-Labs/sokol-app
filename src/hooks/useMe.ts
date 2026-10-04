@@ -24,13 +24,16 @@ export function useMe() {
     queryKey: meKeys.me,
     queryFn: () => rbacApi.getMe(),
     enabled: !!user,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
     retry: 1,
   });
 
   const data = query.data;
   return {
     me: data,
+    refetch: query.refetch,
+    isFetching: query.isFetching,
     userId: data?.userId,
     organizationId: data?.organizationId,
     role: data?.role ?? null,

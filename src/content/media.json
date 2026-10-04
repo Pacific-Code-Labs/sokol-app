@@ -7,7 +7,7 @@
       "path": "/og-image.png",
       "filename": "og-image.png",
       "mime": "image/png",
-      "size": 0,
+      "size": 579202,
       "alt": {
         "es": "Tarjeta social de Sóköl",
         "en": "Sóköl social share card"
@@ -21,7 +21,7 @@
       "path": "/favicon.ico",
       "filename": "favicon.ico",
       "mime": "image/x-icon",
-      "size": 0,
+      "size": 1606,
       "alt": {
         "es": "Favicon de Sóköl",
         "en": "Sóköl favicon"
@@ -35,12 +35,96 @@
       "path": "/apple-touch-icon.png",
       "filename": "apple-touch-icon.png",
       "mime": "image/png",
-      "size": 0,
+      "size": 4974,
       "alt": {
         "es": "Ícono de Sóköl para pantalla de inicio",
         "en": "Sóköl home-screen icon"
       },
       "createdAt": "2026-09-28T00:00:00Z"
+    },
+    {
+      "id": "brand-sokol_l1_primary",
+      "kind": "image",
+      "source": "local",
+      "path": "/brand/sokol_l1_primary.svg",
+      "filename": "sokol_l1_primary.svg",
+      "mime": "image/svg+xml",
+      "size": 6795,
+      "alt": {
+        "es": "Logo principal de Sóköl",
+        "en": "Sóköl primary logo"
+      },
+      "createdAt": "2026-10-03T00:00:00Z"
+    },
+    {
+      "id": "brand-sokol_l2_reverse",
+      "kind": "image",
+      "source": "local",
+      "path": "/brand/sokol_l2_reverse.svg",
+      "filename": "sokol_l2_reverse.svg",
+      "mime": "image/svg+xml",
+      "size": 6795,
+      "alt": {
+        "es": "Logo de Sóköl para fondo oscuro",
+        "en": "Sóköl dark background logo"
+      },
+      "createdAt": "2026-10-03T00:00:00Z"
+    },
+    {
+      "id": "brand-sokol_l3_symbol",
+      "kind": "image",
+      "source": "local",
+      "path": "/brand/sokol_l3_symbol.svg",
+      "filename": "sokol_l3_symbol.svg",
+      "mime": "image/svg+xml",
+      "size": 4179,
+      "alt": {
+        "es": "Símbolo de Sóköl",
+        "en": "Sóköl symbol"
+      },
+      "createdAt": "2026-10-03T00:00:00Z"
+    },
+    {
+      "id": "brand-social-card-es",
+      "kind": "image",
+      "source": "local",
+      "path": "/brand/social-card-es.png",
+      "filename": "social-card-es.png",
+      "mime": "image/png",
+      "size": 579202,
+      "alt": {
+        "es": "Tarjeta social de Sóköl en español",
+        "en": "Sóköl Spanish social card"
+      },
+      "createdAt": "2026-10-03T00:00:00Z"
+    },
+    {
+      "id": "brand-social-card-en",
+      "kind": "image",
+      "source": "local",
+      "path": "/brand/social-card-en.png",
+      "filename": "social-card-en.png",
+      "mime": "image/png",
+      "size": 556626,
+      "alt": {
+        "es": "Tarjeta social de Sóköl en inglés",
+        "en": "Sóköl English social card"
+      },
+      "createdAt": "2026-10-03T00:00:00Z"
+    },
+    {
+      "id": "brand-favicon",
+      "kind": "image",
+      "source": "local",
+      "path": "/favicon.svg",
+      "filename": "favicon.svg",
+      "mime": "image/svg+xml",
+      "size": 4226,
+      "alt": {
+        "es": "Favicon vectorial de Sóköl",
+        "en": "Sóköl vector favicon"
+      },
+      "createdAt": "2026-10-03T00:00:00Z"
     }
   ]
 }

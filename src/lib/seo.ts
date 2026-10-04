@@ -10,7 +10,7 @@
 // /<lang>/<slug> URL (via localizedPath), matching the prerendered Layer-1 HTML;
 // hreflang alternates point at each language's prefixed URL.
 import { useEffect } from "react";
-import { getBranding, getSeo, type SeoContent } from "@/repositories/content.repository";
+import { getBranding, getBundledBranding, getSeo, type SeoContent } from "@/repositories/content.repository";
 import type { Lang } from "@/lib/i18n";
 import { absoluteAssetUrl } from "@/lib/media";
 import { localizedPath } from "@/lib/paths";
@@ -36,7 +36,7 @@ export function routePath(route: string): string {
 }
 
 /** Resolve the head metadata for a route + language from seo.json. */
-export function resolveSeo(route: string, lang: Lang, noindex = false): ResolvedSeo {
+export function resolveSeo(route: string, lang: Lang, noindex = true): ResolvedSeo {
   const seo = getSeo();
   const page = (seo.pages as Record<string, Record<Lang, { title: string; description: string }>>)[route];
   const meta = page?.[lang] ?? page?.es;
@@ -47,7 +47,7 @@ export function resolveSeo(route: string, lang: Lang, noindex = false): Resolved
     // Layer-1 prerendered URL.
     canonical: siteUrl() + localizedPath(lang, routePath(route)),
     // Per-language social card from branding (uploaded in the admin), else the seo default.
-    ogImage: absoluteAssetUrl((getBranding() as { socialCardUrl?: Partial<Record<Lang, string>> }).socialCardUrl?.[lang] || seo.ogImage),
+    ogImage: absoluteAssetUrl(getBranding().socialCardUrl?.[lang] || getBundledBranding().socialCardUrl[lang] || seo.ogImage),
     noindex,
   };
 }
@@ -88,7 +88,10 @@ export function useHeadTags(resolved: ResolvedSeo, lang: Lang, route?: string): 
     upsertMeta('meta[property="og:title"]', "property", "og:title", resolved.title);
     upsertMeta('meta[property="og:description"]', "property", "og:description", resolved.description);
     upsertMeta('meta[property="og:image"]', "property", "og:image", resolved.ogImage);
+    upsertMeta('meta[property="og:url"]', "property", "og:url", resolved.canonical);
+    upsertMeta('meta[property="og:locale"]', "property", "og:locale", lang === "en" ? "en_US" : "es_CR");
     upsertMeta('meta[name="twitter:card"]', "name", "twitter:card", "summary_large_image");
+    upsertMeta('meta[name="twitter:image"]', "name", "twitter:image", resolved.ogImage);
     upsertMeta('meta[name="twitter:title"]', "name", "twitter:title", resolved.title);
     upsertMeta('meta[name="twitter:description"]', "name", "twitter:description", resolved.description);
 
@@ -99,7 +102,7 @@ export function useHeadTags(resolved: ResolvedSeo, lang: Lang, route?: string): 
       upsertLink("alternate", base + routePath(route), "x-default");
     }
 
-    // robots: noindex for 404, index otherwise.
-    upsertMeta('meta[name="robots"]', "name", "robots", resolved.noindex ? "noindex,follow" : "index,follow");
+    // The signed-in app stays private to search engines on every route.
+    upsertMeta('meta[name="robots"]', "name", "robots", "noindex,nofollow");
   }, [resolved.title, resolved.description, resolved.canonical, resolved.ogImage, resolved.noindex, lang, route]);
 }

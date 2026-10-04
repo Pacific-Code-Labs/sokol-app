@@ -1,22 +1,4 @@
-/**
- * BillingContext (FCR-028, card-free) — the self-serve plan/usage surface.
- *
- * Reads the signed-in caller's subscription tier from `GET /me` (via the
- * shared `useMe` hook → `rbacApi.getMe`, cache key ["me"]) and derives the
- * tier's entitlements from the FE plan mirror (`lib/plans.ts`, kept in sync
- * with the BE `src/config/plans.py`). It also surfaces best-effort *usage*:
- *
- *   - saved projects: `used` comes from the authenticated `/projects` list
- *     (the same TanStack Query the dashboard/projects pages read), `cap` from
- *     the plan;
- *   - monthly evaluations: the BE does NOT expose a usage counter on `/me`
- *     today (only the `cap`, plus an `X-Quota-*` 429 on overage), so `used`
- *     stays `null` until a metering endpoint lands (FCR-026/FCR-028 follow-up).
- *
- * NO PayPal / card anything — this is the read-only Free-plan experience.
- * Mount INSIDE `<AuthProvider>` (it depends on the Cognito user) and ABOVE the
- * router so `/pricing` + the dashboard panel can read it.
- */
+/** Server-authoritative token entitlements and saved project usage. */
 import { createContext, useContext, ReactNode, useMemo } from "react";
 import { useMe } from "@/hooks/useMe";
 import { useProjects } from "@/hooks/useProjects";
@@ -31,7 +13,7 @@ export interface UsageMetric {
 }
 
 export interface BillingUsage {
-  evaluations: UsageMetric;
+  tokens: UsageMetric;
   savedProjects: UsageMetric;
 }
 
@@ -51,23 +33,23 @@ interface BillingCtx {
 const BillingContext = createContext<BillingCtx | null>(null);
 
 export function BillingProvider({ children }: { children: ReactNode }) {
-  const { tier: rawTier, isLoading: meLoading } = useMe();
+  const { tier: rawTier, me, isLoading: meLoading } = useMe();
   const { projects, loading: projectsLoading } = useProjects();
 
   const value = useMemo<BillingCtx>(() => {
     const tier = (rawTier as PlanTier) || "free";
-    const plan = getPlan(tier);
+    const plan = { ...getPlan(tier), ...(me?.usage ? { ...me.usage.plan, monthlyTokenBudget: me.usage.limit, maxSavedProjects: me.usage.maxSavedProjects, seats: me.usage.seats } : {}) };
     return {
       tier,
       isFree: tier === "free",
       plan,
       usage: {
-        evaluations: { used: null, cap: plan.monthlyEvaluateQuota },
+        tokens: { used: me?.usage?.used ?? null, cap: me?.usage?.limit ?? null },
         savedProjects: { used: projects.length, cap: plan.maxSavedProjects },
       },
       loading: meLoading || projectsLoading,
     };
-  }, [rawTier, projects.length, meLoading, projectsLoading]);
+  }, [rawTier, me?.usage, projects.length, meLoading, projectsLoading]);
 
   return <BillingContext.Provider value={value}>{children}</BillingContext.Provider>;
 }

@@ -1,3 +1,4 @@
+import { RemainingUsagePanel } from "@/components/RemainingUsagePanel";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -117,6 +118,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        <RemainingUsagePanel />
         <div className="grid gap-6 lg:grid-cols-2">
           {/* ── Personal info ───────────────────────────────────────────── */}
           <Card>

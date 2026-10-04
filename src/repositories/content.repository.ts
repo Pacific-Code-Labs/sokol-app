@@ -39,7 +39,25 @@ export type SeoContent = typeof seo;
 export type MediaContent = typeof media;
 export type SupportContent = typeof support;
 
-export const getBranding = (): BrandingContent => doc("branding", branding);
+/** Empty legacy CMS asset slots inherit the shipped identity; nonempty overrides win. */
+export const getBranding = (): BrandingContent => {
+  const current = doc("branding", branding);
+  return {
+    ...branding,
+    ...current,
+    logoUrl: current.logoUrl || branding.logoUrl,
+    logoUrlDark: current.logoUrlDark || branding.logoUrlDark,
+    markUrl: current.markUrl || branding.markUrl,
+    faviconUrl: current.faviconUrl || branding.faviconUrl,
+    appleTouchIconUrl: current.appleTouchIconUrl || branding.appleTouchIconUrl,
+    ogImage: current.ogImage || branding.ogImage,
+    socialCardUrl: {
+      es: current.socialCardUrl?.es || branding.socialCardUrl.es,
+      en: current.socialCardUrl?.en || branding.socialCardUrl.en,
+    },
+  };
+};
+export const getBundledBranding = (): BrandingContent => branding;
 export const getThemes = (): ThemesContent => doc("themes", themes);
 export const getSeo = (): SeoContent => doc("seo", seo);
 export const getMedia = (): MediaContent => doc("media", media);

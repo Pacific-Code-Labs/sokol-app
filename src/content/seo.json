@@ -1,5 +1,5 @@
 {
-  "siteUrl": "https://sokol.jcampos.dev",
+  "siteUrl": "https://app.sokol.jcampos.dev",
   "defaultTitle": {
     "es": "Sóköl — Asistente NFPA para Costa Rica",
     "en": "Sóköl — NFPA Assistant for Costa Rica"
@@ -8,7 +8,7 @@
     "es": "Asistente bilingüe para interpretar normas NFPA de protección contra incendios y código eléctrico en Costa Rica.",
     "en": "Bilingual assistant to interpret NFPA fire-protection standards and the electrical code in Costa Rica."
   },
-  "ogImage": "/og-image.png",
+  "ogImage": "/brand/social-card-es.png",
   "googleAnalyticsId": "",
   "pages": {
     "home": {
@@ -24,11 +24,11 @@
     "pricing": {
       "es": {
         "title": "Planes y precios — Sóköl",
-        "description": "Empiece gratis con Sóköl: 20 evaluaciones con IA al mes y 3 proyectos guardados. Planes de pago próximamente."
+        "description": "Empiece gratis con Sóköl: asistencia sobre normas NFPA y regulación eléctrica, con uso de IA medido en tokens. Planes de pago próximamente."
       },
       "en": {
         "title": "Plans & pricing — Sóköl",
-        "description": "Start free with Sóköl: 20 AI evaluations per month and 3 saved projects. Paid plans coming soon."
+        "description": "Start free with Sóköl: NFPA and electrical-regulation assistance with token-metered AI usage. Paid plans coming soon."
       }
     }
   }

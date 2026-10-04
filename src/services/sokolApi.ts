@@ -1,3 +1,4 @@
+import type { PlanConfig } from "@/lib/plans";
 /**
  * Sóköl — API service
  *
@@ -98,6 +99,7 @@ export interface EvaluateContext {
   page: "dashboard" | "projects" | "project_detail" | "evaluation" | "demo" | "other";
   project?: Record<string, unknown> | null;
   /** FCR-109: guided-demo step (DEMO MODE only) — teaser | full_evaluation | project. */
+  demo_session_id?: string;
   demo_step?: "teaser" | "full_evaluation" | "project";
 }
 
@@ -158,6 +160,7 @@ export class DemoLimitError extends Error {
  */
 export interface QuotaExceededBody {
   type: "quota_exceeded";
+  unit?: "tokens";
   message: string;
   limit: number;
   current?: number;
@@ -447,6 +450,7 @@ async function resolveBody<T>(op: { response: Promise<{ body: { json: () => Prom
 }
 
 export const sokolApi = {
+  getPlans() { return resolveBody<PlanConfig[]>(get({ apiName: API_NAME, path: "/plans" })); },
   /**
    * GET /rules — returns rules grouped by fire protection category.
    * All params are optional; omitting them returns all groups.

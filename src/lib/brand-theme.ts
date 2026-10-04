@@ -57,7 +57,10 @@ export function applyFavicon(ref?: string | null): void {
     link.rel = "icon";
     document.head.appendChild(link);
   }
-  link.href = href;
+  link.href = /^\/favicon\.(svg|ico)$/i.test(href) ? `${href}?v=sokol-20261003` : href;
+  link.type = /\.svg(?:[?#]|$)/i.test(href) ? "image/svg+xml"
+    : /\.ico(?:[?#]|$)/i.test(href) ? "image/x-icon" : "image/png";
+  link.removeAttribute("sizes");
 }
 
 /** Upsert the iOS home-screen icon from branding (optional field). */

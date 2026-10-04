@@ -1,23 +1,15 @@
-import { Flame } from "lucide-react";
+import { BrandLogo } from "@pacific-code-labs/sokol-design-system";
+import { useLang } from "@/contexts/LangContext";
+import { getBrandingVM } from "@/services/branding.service";
 import { cn } from "@/lib/utils";
 
-/**
- * Brand identity mark for the assistant — a flame in a fire-orange gradient disc
- * with a soft glow ring. Rendered beside every assistant message + in the
- * welcome / typing states so the agent reads as a consistent persona.
- */
+/** The approved Sóköl symbol beside messages, welcome and typing states. */
 export function AssistantAvatar({ className }: { className?: string }) {
+  const { lang } = useLang();
+  const brand = getBrandingVM(lang);
   return (
-    <div
-      className={cn(
-        "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-        "bg-gradient-to-br from-primary to-[hsl(var(--primary-glow))] text-primary-foreground",
-        "shadow-[var(--shadow-glow)] ring-1 ring-primary/30",
-        className,
-      )}
-      aria-hidden
-    >
-      <Flame className="h-4 w-4" />
+    <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center", className)} aria-hidden>
+      <BrandLogo name={brand.companyName} markUrl={brand.markUrl} Icon={brand.LogoIcon} variant="mark" imgClassName="h-full w-full" className="h-full w-full" />
     </div>
   );
 }

@@ -1,19 +1,13 @@
-/**
- * Plan/tier mirror (FCR-024 / FCR-028) — the FE projection of the BE
- * `src/config/plans.py` entitlements. Keep these numbers in lockstep with the
- * backend; they drive the Pricing page cards + the dashboard "Current plan"
- * usage caps. `null` means unlimited.
- *
- * NO prices / PayPal here — paid tiers are "coming soon" (FCR-027 deferred).
- * Only the **Free** numbers are owner-final; Pro/Enterprise are placeholders
- * mirrored from the BE for display continuity.
+/** Offline plan defaults; the server and admin-managed policy are authoritative.
+ * Token budgets are provisional. Paid checkout remains coming soon.
  */
 export type PlanTier = "free" | "pro" | "enterprise";
 
 export interface PlanConfig {
   tier: PlanTier;
-  /** Monthly AI evaluations; null = unlimited. */
-  monthlyEvaluateQuota: number | null;
+  name_es?: string; name_en?: string; description_es?: string; description_en?: string;
+  /** Provisional monthly AI tokens; server configuration is authoritative. */
+  monthlyTokenBudget: number | null;
   /** Saved projects cap; null = unlimited. */
   maxSavedProjects: number | null;
   /** Included seats. */
@@ -25,21 +19,21 @@ export interface PlanConfig {
 export const PLANS: Record<PlanTier, PlanConfig> = {
   free: {
     tier: "free",
-    monthlyEvaluateQuota: 20,
+    monthlyTokenBudget: 3_000_000,
     maxSavedProjects: 3,
     seats: 1,
     selfServe: true,
   },
   pro: {
     tier: "pro",
-    monthlyEvaluateQuota: 500,
+    monthlyTokenBudget: 30_000_000,
     maxSavedProjects: 100,
     seats: 1,
     selfServe: false,
   },
   enterprise: {
     tier: "enterprise",
-    monthlyEvaluateQuota: null,
+    monthlyTokenBudget: 100_000_000,
     maxSavedProjects: null,
     seats: 5,
     selfServe: false,

@@ -1,4 +1,6 @@
+import { useAssistantRuntimeRef, useAssistantChatState } from "@/contexts/AssistantContext";
 import { useState, useRef, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Send, Sparkles, Loader2, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -132,7 +134,7 @@ function toConversation(messages: Msg[]): ConversationTurn[] {
         m.type !== "needs_info" &&
         (m.text?.trim()?.length ?? 0) > 0,
     )
-    .map<ConversationTurn>((m) => ({ role: m.role, content: m.text }))
+    .map<ConversationTurn>((m) => ({ role: m.role, content: m.role === "assistant" && m.payload && ["evaluation", "project", "electrical"].includes(m.type ?? "") ? JSON.stringify(m.payload, (key, value) => key === "matchedRules" && Array.isArray(value) ? value.map((r) => ({ id: r.id, standard: r.standard, title: r.title })) : value) : m.text }))
     .slice(-MAX_CONVERSATION_TURNS);
 }
 
@@ -157,23 +159,23 @@ interface AskOptions {
 export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false, onApplyScenario }: Props) {
   const { lang, tr } = useLang();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   // FCR-118: capabilities are resolved per variant (demo vs internal) so each
   // assistant's available functions are controlled from one declarative place.
   const caps = getAssistantCapabilities(demo);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { input, setInput, isLoading, setIsLoading } = useAssistantChatState();
   // FCR-026: the authenticated /evaluate quota gate returns 402/429 → QuotaError.
   // The public demo path keeps using DemoLimitError; this is the signed-in path.
   const [quota, setQuota] = useState<QuotaError | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // FCR-100 guided-demo state (refs avoid re-render churn / setState races).
-  const demoNextRef = useRef<PromptKind | null>(null);
-  const activeScenarioRef = useRef<DemoScenario | null>(null);
-  const activeQueryRef = useRef<string>("");
-  const demoEndedRef = useRef<boolean>(false);
-  const projectReofferedRef = useRef<boolean>(false); // FCR-115: re-offer the project once on decline
-  const projectCreatedRef = useRef<boolean>(false); // FCR-116: a project preview already shown → stop offering "create project", go to sign-up
+  const demoNextRef = useAssistantRuntimeRef<PromptKind | null>("demoNextRef", null);
+  const activeScenarioRef = useAssistantRuntimeRef<DemoScenario | null>("activeScenarioRef", null);
+  const activeQueryRef = useAssistantRuntimeRef<string>("activeQueryRef", "");
+  const demoEndedRef = useAssistantRuntimeRef<boolean>("demoEndedRef", false);
+  const projectReofferedRef = useAssistantRuntimeRef<boolean>("projectReofferedRef", false); // FCR-115: re-offer the project once on decline
+  const projectCreatedRef = useAssistantRuntimeRef<boolean>("projectCreatedRef", false); // FCR-116: a project preview already shown → stop offering "create project", go to sign-up
   // FCR-114: a conversational, one-question-at-a-time flow (intake + agent needs_info).
   const questionFlowRef = useRef<{
     qs: NeedsInfoQuestion[];
@@ -412,6 +414,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         handleError(err);
       }
     } finally {
+      void queryClient.invalidateQueries({ queryKey: ["me"] });
       setIsLoading(false);
     }
   };

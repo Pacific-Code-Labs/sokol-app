@@ -1,13 +1,4 @@
-/**
- * CurrentPlanPanel (FCR-028) — the dashboard "Current plan" + usage card.
- *
- * Shows the signed-in caller's tier (Free today) and best-effort usage bars:
- *   - saved projects: used / cap (used known from the /projects list);
- *   - monthly evaluations: cap-only today (the BE exposes no usage counter on
- *     /me yet — see BillingContext), so the bar renders as a cap label.
- * Card-free; links to the public /pricing surface. Bilingual via LangContext,
- * DS primitives.
- */
+/** Current plan and server-reported monthly AI token usage. */
 import { Link } from "react-router-dom";
 import {
   Badge,
@@ -34,6 +25,7 @@ const NAME_KEY: Record<PlanTier, keyof Dict> = {
 };
 
 function usageText(metric: UsageMetric, tr: Dict): string {
+  if (metric.cap === null && metric.used === null) return tr.profile_usage_unavailable;
   if (metric.cap === null) return tr.plan_panel_usage_unlimited;
   if (metric.used === null) return fill(tr.plan_panel_usage_cap_only, { cap: metric.cap });
   return fill(tr.plan_panel_usage_known, { used: metric.used, cap: metric.cap });
@@ -65,7 +57,7 @@ function UsageRow({ label, metric, tr }: { label: string; metric: UsageMetric; t
 
 export function CurrentPlanPanel() {
   const { lang, tr } = useLang();
-  const { tier, usage } = useBilling();
+  const { tier, plan, usage } = useBilling();
 
   return (
     <Card>
@@ -74,10 +66,10 @@ export function CurrentPlanPanel() {
           <CardTitle>{tr.plan_panel_title}</CardTitle>
           <p className="text-sm text-muted-foreground">{tr.plan_panel_subtitle}</p>
         </div>
-        <Badge variant="success">{tr[NAME_KEY[tier]]}</Badge>
+        <Badge variant="success">{plan[`name_${lang}`] ?? tr[NAME_KEY[tier]]}</Badge>
       </CardHeader>
       <CardBody className="space-y-4">
-        <UsageRow label={tr.plan_panel_evals} metric={usage.evaluations} tr={tr} />
+        <UsageRow label={tr.plan_panel_evals} metric={usage.tokens} tr={tr} />
         <UsageRow label={tr.plan_panel_projects} metric={usage.savedProjects} tr={tr} />
         <Link
           to={localizedPath(lang, "/pricing")}
