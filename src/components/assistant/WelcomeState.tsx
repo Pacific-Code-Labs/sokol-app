@@ -6,6 +6,7 @@ import { AssistantAvatar } from "./AssistantAvatar";
 interface Props {
   /** Tap handler — applies the scenario (grounds the agent + fills the inputs). */
   onPick: (scenario: DemoScenario) => void;
+  showExamples?: boolean;
 }
 
 /**
@@ -14,7 +15,7 @@ interface Props {
  * so the tap grounds the agent and returns a rich evaluation — the very first
  * tap showcases the agent's depth. Cards reveal with a stagger.
  */
-export function WelcomeState({ onPick }: Props) {
+export function WelcomeState({ onPick, showExamples = false }: Props) {
   const { tr } = useLang();
   const scenarios = getDemoScenarios(tr);
 
@@ -27,7 +28,7 @@ export function WelcomeState({ onPick }: Props) {
         <p className="text-pretty text-sm text-muted-foreground">{tr.demoWelcomeSubtitle}</p>
       </div>
 
-      <div className="grid w-full gap-2 sm:grid-cols-2">
+      {showExamples && <div className="grid w-full gap-2 sm:grid-cols-2">
         {scenarios.map((s, i) => (
           <button
             key={s.label}
@@ -43,7 +44,7 @@ export function WelcomeState({ onPick }: Props) {
             <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
           </button>
         ))}
-      </div>
+      </div>}
 
       <div className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
         <Flame className="h-3 w-3 text-primary" />

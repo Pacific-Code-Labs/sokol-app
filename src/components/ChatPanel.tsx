@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Send, Sparkles, Loader2, Trash2, X, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@pacific-code-labs/sokol-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { fmt } from "@/lib/chrome-i18n";
 import { sokolApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse, type NeedsInfoQuestion, type ElectricalInputs, type ElectricalOccupancy } from "@/services/sokolApi";
@@ -708,8 +708,8 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
-        {messages.length === 0 && <WelcomeState onPick={handlePick} />}
+      <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+        {messages.length === 0 && <WelcomeState onPick={handlePick} showExamples={demo} />}
 
         {messages.map((m, i) => {
           // FCR-114/117: rich cards (evaluation/project/electrical) carry the CR
@@ -763,16 +763,18 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       <form
         data-tour="assistant"
         onSubmit={(e) => { e.preventDefault(); handleSend(input); }}
-        className="flex items-center gap-2 border-t border-border p-3"
+        className="flex shrink-0 items-end gap-2 border-t border-border p-3"
       >
-        <Input
+        <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={tr.askPlaceholder}
-          className="bg-input/60"
+          aria-label={tr.askPlaceholder}
+          rows={4}
+          className="min-h-[112px] max-h-60 resize-y bg-input/60 leading-relaxed"
           disabled={isLoading}
         />
-        <Button type="submit" size="icon" className="shrink-0" disabled={isLoading}>
+        <Button type="submit" size="icon" aria-label={tr.send} className="shrink-0" disabled={isLoading || !input.trim()}>
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </form>

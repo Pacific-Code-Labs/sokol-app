@@ -4,12 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { ChatPanel, type Msg } from "@/components/ChatPanel";
 import { t } from "@/lib/i18n";
+import { getDemoScenarios } from "@/lib/demoScenarios";
 
 const api = vi.hoisted(() => ({ evaluate: vi.fn(), evaluateDemo: vi.fn() }));
 vi.mock("@/services/sokolApi", () => ({ sokolApi: api, BuildingType: { residencial: 1, comercial: 2, industrial: 3 }, DemoLimitError: class extends Error {}, QuotaError: class extends Error {} }));
 vi.mock("@/contexts/LangContext", () => ({ useLang: () => ({ lang: "es", tr: t.es }) }));
 vi.mock("@/components/UpgradeModal", () => ({ UpgradeModal: () => null }));
-vi.mock("@/components/assistant/WelcomeState", () => ({ WelcomeState: () => null }));
 vi.mock("@/components/assistant/AssistantAvatar", () => ({ AssistantAvatar: () => null }));
 vi.mock("@/components/assistant/EvaluationCard", () => ({ EvaluationCard: () => null }));
 vi.mock("@/components/assistant/ProjectCard", () => ({ ProjectCard: () => null }));
@@ -126,4 +126,21 @@ it("keeps each evaluation button tied to its own request after later responses",
   expect(screen.getByTestId("result")).toHaveTextContent('"area_m2":350');
   fireEvent.click(screen.getAllByRole("button", { name: t.es.assistant_open_evaluator })[1]);
   expect(screen.getByTestId("result")).toHaveTextContent('"area_m2":120');
+});
+
+
+it.each([false, true])("shows examples only in the demo and keeps a multiline composer (demo=%s)", demo => {
+  render(<QueryClientProvider client={new QueryClient()}><MemoryRouter><Harness demo={demo} /></MemoryRouter></QueryClientProvider>);
+  const prompt = screen.getByRole("textbox", { name: t.es.askPlaceholder });
+  expect(prompt.tagName).toBe("TEXTAREA");
+  expect(prompt).toHaveAttribute("rows", "4");
+  for (const scenario of getDemoScenarios(t.es)) {
+    if (demo) expect(screen.getByRole("button", { name: scenario.label })).toBeInTheDocument();
+    else expect(screen.queryByRole("button", { name: scenario.label })).not.toBeInTheDocument();
+  }
+  expect(screen.getByRole("button", { name: t.es.send })).toBeDisabled();
+  fireEvent.change(prompt, { target: { value: "Evalúa mi restaurante\nÁrea: 350 m²\nDos pisos" } });
+  expect(prompt).toHaveValue("Evalúa mi restaurante\nÁrea: 350 m²\nDos pisos");
+  expect(screen.getByRole("button", { name: t.es.send })).toBeEnabled();
+  expect(api.evaluate).not.toHaveBeenCalled();
 });
