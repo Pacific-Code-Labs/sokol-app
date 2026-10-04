@@ -45,14 +45,14 @@ export function DashboardLayout() {
     return () => { document.body.style.overflow = previous; };
   }, []);
   return <>
-    <AppShell location={location.pathname} topItems={topItems} groups={groups} onNavigate={navigate}
+    <div className="premium-workspace"><AppShell location={location.pathname} topItems={topItems} groups={groups} onNavigate={navigate}
       navigationStyle="compact" sidebarStorageKey="sokol-app-sidebar-collapsed"
       labels={{ expand: tr.nav_show_sidebar, collapse: tr.nav_hide_sidebar, close: tr.nav_close_menu }}
       brand={() => <BrandLogo name={brand.companyName} logoUrl={brand.logoUrl} logoUrlDark={brand.logoUrlDark} markUrl={brand.markUrl} Icon={brand.LogoIcon} imgClassName="h-7" />}
-      topbar={(openMenu) => <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-4">
+      topbar={(openMenu) => <header className="workspace-topbar flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4">
         <div className="flex min-w-0 items-center gap-3">
-          <button type="button" onClick={openMenu} aria-label={tr.nav_show_sidebar} className="rounded-md p-2 text-muted-foreground hover:bg-muted lg:hidden"><Menu className="h-5 w-5" /></button>
-          <h1 className="truncate text-sm font-semibold">{title}</h1>
+          <button type="button" onClick={openMenu} aria-label={tr.nav_show_sidebar} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted lg:hidden"><Menu className="h-5 w-5" /></button>
+          <h1 className="truncate text-base font-semibold tracking-tight">{title}</h1>
         </div>
         <div className="flex items-center gap-2">{user && <AppTutorial key={user.userId} userId={user.userId} ready={permissions.isReady} dashboard={visible("panel", "overview")} projects={visible("projects", "projects")} evaluator={visible("projects", "evaluator")} />}<ThemeToggle /><LanguageToggle /></div>
       </header>}
@@ -63,7 +63,7 @@ export function DashboardLayout() {
         </button>
         <button type="button" onClick={async () => { await signOut(); navigate(localizedPath(lang, "/login"), { replace: true }); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-accent"><LogOut className="h-4 w-4" />{tr.sign_out}</button>
       </div>}
-    ><div className="mx-auto max-w-6xl"><PageTransition><Outlet /></PageTransition></div></AppShell>
+    ><div className="mx-auto max-w-6xl"><PageTransition><Outlet /></PageTransition></div></AppShell></div>
     <GlobalAssistant />
     <NewProjectDrawer />
   </>;

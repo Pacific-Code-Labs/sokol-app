@@ -680,8 +680,8 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   };
 
   return (
-    <div className="panel flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+    <div className="premium-assistant panel flex h-full flex-col">
+      <div className="assistant-panel-header flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
           <span className="text-sm font-semibold">{tr.assistant}</span>

@@ -10,6 +10,7 @@ import { captureDemoDraft } from "./lib/demoDraft";
 // the app does not redefine.
 import "@pacific-code-labs/sokol-design-system/styles";
 import "./index.css";
+import "./styles/workspace.css";
 // FCR-080: apply the active DXP brand theme (themes.json → DS theme engine) +
 // favicon (branding.json) once at boot, BEFORE first paint of <App/>. The
 // dark/light mode itself is still owned by contexts/ThemeContext, which

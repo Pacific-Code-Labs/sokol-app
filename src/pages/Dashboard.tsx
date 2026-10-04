@@ -33,14 +33,14 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="space-y-6">
-        <div>
+      <div className="premium-dashboard space-y-6">
+        <div className="workspace-intro">
           <h2 className="text-2xl font-bold tracking-tight">{tr.welcome_back}</h2>
           <p className="text-sm text-muted-foreground">{name}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Card className="flex flex-col">
+          <Card className="workspace-stat flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium">{tr.total_projects}</CardTitle>
               <FolderKanban className="h-4 w-4 text-muted-foreground" />
@@ -59,7 +59,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card data-tour="dashboard" className="flex flex-col border-primary/30">
+          <Card data-tour="dashboard" className="workspace-stat workspace-stat--accent flex flex-col border-primary/30">
             <CardHeader>
               <CardTitle className="text-sm font-medium">{tr.new_evaluation}</CardTitle>
               <CardDescription>{tr.run_evaluator}</CardDescription>
@@ -76,7 +76,7 @@ export default function Dashboard() {
 
         </div>
 
-        <Card>
+        <Card className="workspace-collection">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>{tr.recent_projects}</CardTitle>

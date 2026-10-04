@@ -32,7 +32,7 @@ export function AuthShell({
   const { lang } = useLang();
   const brand = getBrandingVM(lang);
   return (
-    <div className="min-h-[100dvh] grid place-items-center bg-background px-4 py-10 relative">
+    <div className="premium-auth min-h-[100dvh] grid place-items-center bg-background px-4 py-10 relative">
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <ThemeToggle />
         <LanguageToggle />
@@ -51,7 +51,7 @@ export function AuthShell({
           />
         </div>
 
-        <Card>
+        <Card className="premium-auth-card">
           <CardHeader className="text-center pb-2">
             {icon && (
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 border border-primary/30 text-primary">

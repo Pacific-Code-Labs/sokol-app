@@ -1,0 +1,72 @@
+/* Product surfaces share the marketing palette; operational color tokens retain their meaning. */
+.premium-workspace, .premium-demo, .premium-auth, .premium-assistant {
+  --workspace-line: hsl(var(--foreground) / .09);
+  --workspace-shadow: 0 12px 36px -26px hsl(var(--foreground) / .25);
+}
+.premium-workspace { height: 100dvh; }
+.premium-workspace #page-content {
+  background: radial-gradient(ellipse at 85% 0%, hsl(var(--primary) / .035), transparent 45%), hsl(var(--background));
+  scrollbar-gutter: stable;
+}
+.premium-workspace aside { background: linear-gradient(180deg, hsl(var(--sidebar-background)), hsl(var(--background))); }
+.premium-workspace aside nav button { border-radius: .7rem; }
+.premium-workspace aside nav button[aria-current="page"] { box-shadow: inset 2px 0 hsl(var(--primary)); }
+.premium-workspace .workspace-topbar {
+  background: hsl(var(--background) / .94);
+  border-color: var(--workspace-line);
+  padding-inline: clamp(1rem, 2.5vw, 2rem);
+}
+.premium-workspace :is(.workspace-card, .workspace-shortcut, .panel) {
+  border-radius: 1rem;
+  border-color: var(--workspace-line);
+  background: linear-gradient(135deg, hsl(var(--foreground) / .025), transparent 65%), hsl(var(--card));
+  box-shadow: var(--workspace-shadow);
+}
+.premium-workspace :is(.workspace-intro, .workspace-page-heading) { padding-block: .75rem 1.25rem; }
+.premium-workspace :is(.workspace-intro, .workspace-page-heading) :is(h1, h2) {
+  font-size: clamp(1.7rem, 2.8vw, 2.25rem); font-weight: 550; line-height: 1.2; letter-spacing: -.045em;
+}
+.premium-workspace :is(.workspace-intro, .workspace-page-heading) p { margin-top: .6rem; line-height: 1.65; }
+.premium-workspace .workspace-stat { position: relative; overflow: hidden; min-height: 210px; }
+.premium-workspace .workspace-stat--accent { background: radial-gradient(ellipse at top right, hsl(var(--primary) / .08), transparent 70%), hsl(var(--card)); border-color: hsl(var(--primary) / .2); }
+.premium-workspace .workspace-shortcut { transition: border-color .2s, box-shadow .2s; }
+.premium-workspace .workspace-shortcut:hover { border-color: hsl(var(--primary) / .4); box-shadow: 0 12px 32px -24px hsl(var(--primary) / .3); }
+.premium-workspace .workspace-table { border-radius: 1rem; border-color: var(--workspace-line); box-shadow: var(--workspace-shadow); }
+.premium-workspace .workspace-table th { font-size: .68rem; letter-spacing: .025em; padding-block: 1rem; background: hsl(var(--foreground) / .025); }
+.premium-workspace .workspace-table td { padding-block: 1rem; }
+:is(.premium-workspace, .premium-demo, .premium-auth, .premium-assistant) :is(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
+  border-radius: .65rem;
+  border-color: hsl(var(--foreground) / .13);
+  background-color: hsl(var(--background) / .8);
+}
+:is(.premium-workspace, .premium-demo, .premium-auth, .premium-assistant) :is(input, textarea, select):focus-visible { outline-offset: 2px; }
+.premium-demo { background: radial-gradient(ellipse at 10% 0%, hsl(var(--primary) / .04), transparent 40%), hsl(var(--background)); }
+.premium-demo .demo-intro { padding-block: .75rem 1.5rem; }
+.premium-demo .demo-intro h1 { font-weight: 550; letter-spacing: -.045em; line-height: 1.15; max-width: 23ch; }
+.premium-demo .demo-intro p { line-height: 1.7; max-width: 55ch; }
+.premium-demo .panel { border-radius: 1rem; border-color: var(--workspace-line); background: hsl(var(--card)); box-shadow: var(--workspace-shadow); }
+.premium-demo .demo-assistant-column { top: 5.5rem; }
+.premium-assistant.panel { border-radius: 1rem; border-color: var(--workspace-line); background: hsl(var(--card)); box-shadow: var(--workspace-shadow); overflow: hidden; }
+.premium-assistant .assistant-panel-header { padding: 1rem 1.25rem; background: hsl(var(--foreground) / .018); border-color: var(--workspace-line); }
+.premium-assistant .assistant-welcome { gap: 1.25rem; padding-block: 1.25rem; }
+.premium-assistant .assistant-welcome h3 { font-size: 1.15rem; font-weight: 550; letter-spacing: -.025em; }
+.premium-assistant .assistant-example { background: linear-gradient(135deg, hsl(var(--foreground) / .025), transparent); border-color: var(--workspace-line); }
+.premium-assistant .assistant-example:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+.premium-assistant .assistant-example:hover { border-color: hsl(var(--primary) / .4); }
+.premium-assistant > form { padding: 1rem; border-color: var(--workspace-line); background: hsl(var(--foreground) / .018); }
+.premium-auth { background: radial-gradient(ellipse at 50% 25%, hsl(var(--primary) / .06), transparent 60%), hsl(var(--background)); }
+.premium-auth .premium-auth-card { border-radius: 1.25rem; border-color: var(--workspace-line); box-shadow: 0 24px 80px -40px hsl(var(--foreground) / .25); background: hsl(var(--card)); }
+.premium-auth .premium-auth-card h3 { font-size: 1.5rem; line-height: 1.25; font-weight: 550; letter-spacing: -.03em; }
+@media (max-width: 639px) {
+  .premium-demo .demo-intro { padding-bottom: .75rem; }
+  .premium-workspace .workspace-topbar { padding-inline: .75rem; }
+  .premium-workspace .workspace-topbar > div { gap: .4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .premium-assistant .assistant-welcome, .premium-assistant .assistant-example { animation: none; }
+  .premium-assistant .assistant-example svg, .premium-workspace .workspace-shortcut { transition: none; transform: none; }
+}
+@media print {
+  .premium-demo, .premium-workspace #page-content { background: white; }
+  .premium-demo .panel, .premium-workspace .workspace-card { box-shadow: none; }
+}
