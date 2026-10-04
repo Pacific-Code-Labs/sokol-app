@@ -444,7 +444,7 @@
       "profile_usage_resets": "Se renueva el {date} (UTC).",
       "profile_usage_unavailable": "No se pudo consultar el uso. Inténtelo de nuevo.",
       "profile_usage_refresh": "Actualizar uso",
-      "profile_weekly_quota": "Cuota cada 8 días",
+      "profile_weekly_quota": "Cuota semanal",
       "profile_monthly_quota": "Cuota mensual",
       "profile_tokens_allowance": "Cuota de tokens"
     },
