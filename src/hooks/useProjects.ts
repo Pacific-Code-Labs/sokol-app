@@ -50,10 +50,11 @@ export interface Project {
   /** FCR-118: the saved electrical-study snapshot (electrical projects only). */
   electrical?: ElectricalSnapshot;
   createdAt: string;
+  updatedAt?: string;
 }
 
 /** Fields a caller supplies when creating a project (no id/createdAt). */
-export type NewProjectInput = Omit<Project, "id" | "createdAt">;
+export type NewProjectInput = Omit<Project, "id" | "createdAt" | "updatedAt">;
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -103,6 +104,7 @@ function fromResponse(r: ProjectResponse): Project {
     projectType: r.projectType,
     electrical: r.electrical ?? undefined,
     createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
   };
 }
 

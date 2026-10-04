@@ -10,7 +10,7 @@ import { Select } from "@pacific-code-labs/sokol-design-system";
  * kVA, transformer, phase balance, mandated provisions) render live and the
  * study can be saved as an `electrical` project.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Save, Zap } from "lucide-react";
@@ -51,7 +51,7 @@ export default function ElectricalProject() {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("projectId") ?? undefined;
   const { project: editProject } = useProject(editId ?? "");
-  const sourceSnapshotRef = useRef<string | null>(null);
+  const sourceSnapshotKey = editProject ? JSON.stringify({ id: editId, updatedAt: editProject.updatedAt, electrical: editProject.electrical ?? null }) : null;
   const [editorRevision, setEditorRevision] = useState(0);
 
   const [inputs, setInputs] = useState<ElectricalInputs>({
@@ -96,9 +96,7 @@ export default function ElectricalProject() {
     // Query invalidation after an assistant save supplies a new snapshot.
     // Only backend snapshot changes reset the editor; local edits and language
     // changes keep the current graph and form state.
-    const sourceKey = JSON.stringify({ id: editId, electrical: editProject?.electrical ?? null });
-    if (sourceSnapshotRef.current === sourceKey) return;
-    sourceSnapshotRef.current = sourceKey;
+    let alive = true;
     const snap = editProject?.electrical;
     if (snap?.result) {
       setInputs({ ...snap.inputs, language: lang });
@@ -112,14 +110,16 @@ export default function ElectricalProject() {
       sokolApi
         .postElectricalPreliminary({ inputs })
         .then((r) => {
+          if (!alive) return;
           setSeed(r);
           setResult(r);
           setSnapshotTopology(r.topology);
         })
-        .catch(() => setSeed({ topology: EMPTY_TOPOLOGY } as ElectricalLoadData));
+        .catch(() => { if (alive) setSeed({ topology: EMPTY_TOPOLOGY } as ElectricalLoadData); });
     }
+    return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editId, editProject, lang]);
+  }, [editId, sourceSnapshotKey]);
 
   useEffect(() => {
     setPageContext(editProject ? { page: "project_detail", payload: { project: editProject } } : { page: "other" });
