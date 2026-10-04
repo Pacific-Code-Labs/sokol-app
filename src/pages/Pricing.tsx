@@ -4,8 +4,8 @@ import { sokolApi } from "@/services/sokolApi";
  * Pricing (FCR-028, public, card-free) — the 3-tier plan surface.
  *
  * Renders Free / Pro / Enterprise cards from the FE plan mirror (`lib/plans.ts`,
- * synced with BE `config/plans.py`). For a signed-in Free user the Free card is
- * shown as ACTIVE / current plan. Pro + Enterprise are marked "Coming soon"
+ * synced with BE `config/plans.py`). The signed-in user's tier is marked as
+ * the current plan. Unavailable paid tiers are marked "Coming soon"
  * (NO checkout, NO PayPal, NO card fields). Bilingual via LangContext; DS
  * primitives (Card/Badge/Button) from `@pacific-code-labs/sokol-design-system`.
  */
@@ -64,22 +64,22 @@ export default function Pricing() {
   const { lang, tr } = useLang();
   const plans = useQuery({ queryKey: ["plans"], queryFn: () => sokolApi.getPlans(), staleTime: 60_000 });
   const { user } = useAuth();
-  const { tier, isFree } = useBilling();
+  const { tier, loading } = useBilling();
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[100dvh] bg-background">
+    <div className={user ? "bg-background" : "min-h-[100dvh] bg-background"}>
       {!user && <Header />}
       <main className="container py-12">
         <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-3xl font-bold tracking-tight">{tr.pricing_title}</h1>
-          <p className="mt-2 text-muted-foreground">{tr.pricing_subtitle}</p>
+          <h1 className="text-3xl font-bold tracking-tight">{user ? tr.profile_select_plan : tr.pricing_title}</h1>
+          <p className="mt-2 text-muted-foreground">{user ? tr.profile_select_plan_hint : tr.pricing_subtitle}</p>
         </div>
 
         <div className="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-3">
           {PLAN_ORDER.map((t) => {
             const plan = plans.data?.find((p) => p.tier === t) ?? PLANS[t];
-            const isCurrent = !!user && tier === t && t === "free";
+            const isCurrent = !!user && !loading && tier === t;
             const comingSoon = !plan.selfServe;
             return (
               <Card
@@ -90,7 +90,7 @@ export default function Pricing() {
                   <div className="flex items-center justify-between gap-2">
                     <CardTitle>{plan[`name_${lang}`] ?? tr[NAME_KEY[t]]}</CardTitle>
                     {isCurrent && <Badge variant="success">{tr.pricing_active_badge}</Badge>}
-                    {comingSoon && <Badge variant="info">{tr.pricing_coming_soon}</Badge>}
+                    {comingSoon && !isCurrent && <Badge variant="info">{tr.pricing_coming_soon}</Badge>}
                   </div>
                   <p className="text-sm text-muted-foreground">{plan[`description_${lang}`] ?? tr[TAGLINE_KEY[t]]}</p>
                 </CardHeader>
@@ -107,19 +107,17 @@ export default function Pricing() {
                 </CardBody>
 
                 <CardFooter>
-                  {t === "free" ? (
-                    isCurrent ? (
-                      <Button variant="outline" disabled className="w-full">
-                        {tr.pricing_free_cta_active}
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full"
-                        onClick={() => navigate(localizedPath(lang, user ? "/dashboard" : "/register"))}
-                      >
-                        {user ? tr.pricing_back_dashboard : tr.pricing_free_cta_anon}
-                      </Button>
-                    )
+                  {isCurrent ? (
+                    <Button variant="outline" disabled className="w-full">
+                      {tr.pricing_free_cta_active}
+                    </Button>
+                  ) : t === "free" ? (
+                    <Button
+                      className="w-full"
+                      onClick={() => navigate(localizedPath(lang, user ? "/dashboard" : "/register"))}
+                    >
+                      {user ? tr.pricing_back_dashboard : tr.pricing_free_cta_anon}
+                    </Button>
                   ) : (
                     // Pro / Enterprise — NO checkout / PayPal yet (FCR-027 deferred).
                     <Button variant="outline" disabled className="w-full">
@@ -132,10 +130,10 @@ export default function Pricing() {
           })}
         </div>
 
-        {user && isFree && (
+        {user && (
           <div className="mx-auto mt-8 max-w-5xl text-center">
-            <Link to={localizedPath(lang, "/dashboard")} className={buttonVariants({ variant: "ghost" })}>
-              {tr.pricing_back_dashboard}
+            <Link to={localizedPath(lang, "/dashboard/profile")} className={buttonVariants({ variant: "ghost" })}>
+              {tr.profile_back_to_profile}
             </Link>
           </div>
         )}

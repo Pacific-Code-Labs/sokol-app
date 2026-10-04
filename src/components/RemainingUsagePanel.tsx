@@ -6,7 +6,7 @@ export function RemainingUsagePanel() {
   const { lang, tr } = useLang();
   const { me, isLoading, isError, refetch, isFetching } = useMe();
   const usage = me?.usage;
-  return <Card className="mb-6">
+  return <Card>
     <CardHeader><CardTitle>{tr.profile_remaining_usage}</CardTitle><CardDescription>{tr.profile_usage_hint}</CardDescription></CardHeader>
     <CardBody>
       {isLoading ? <Skeleton className="h-24 w-full" /> : isError || !usage?.weekly ? <p role="alert" className="text-sm text-muted-foreground">{tr.profile_usage_unavailable}</p> : <>

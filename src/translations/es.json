@@ -447,7 +447,12 @@
       "profile_usage_refresh": "Actualizar uso",
       "profile_weekly_quota": "Cuota semanal",
       "profile_monthly_quota": "Cuota mensual",
-      "profile_tokens_allowance": "Cuota de tokens"
+      "profile_tokens_allowance": "Cuota de tokens",
+      "profile_plan_hint": "Su suscripción y los recursos incluidos.",
+      "profile_plan_unavailable": "No se pudo cargar su plan actual. Intente de nuevo más tarde.",
+      "profile_select_plan": "Seleccione su plan",
+      "profile_back_to_profile": "Volver al perfil",
+      "profile_select_plan_hint": "Compare los planes y revise los recursos incluidos."
     },
     "roles": {
       "roles_title": "Roles y permisos",

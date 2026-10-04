@@ -447,7 +447,12 @@
       "profile_usage_refresh": "Refresh usage",
       "profile_weekly_quota": "Weekly quota",
       "profile_monthly_quota": "Monthly quota",
-      "profile_tokens_allowance": "Token allowance"
+      "profile_tokens_allowance": "Token allowance",
+      "profile_plan_hint": "Your subscription and included resources.",
+      "profile_plan_unavailable": "Your current plan could not be loaded. Please try again later.",
+      "profile_select_plan": "Select your plan",
+      "profile_back_to_profile": "Back to profile",
+      "profile_select_plan_hint": "Compare plans and review the included resources."
     },
     "roles": {
       "roles_title": "Roles & permissions",
