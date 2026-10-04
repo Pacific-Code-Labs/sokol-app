@@ -16,9 +16,10 @@ for (const lang of ["es", "en"]) {
     .replace(/<title>[^<]*<\/title>/, `<title>${seo.defaultTitle[lang]}</title>`)
     .replace(/(<meta name="description" content=")[^"]*/, `$1${seo.defaultDescription[lang]}`);
   for (const route of ["", ...routes]) {
-    const dir = path.join("dist", lang, route);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(path.join(dir, "index.html"), html);
+    // Pages serves /path from path.html without a directory-slash redirect.
+    const file = path.join("dist", `${lang}${route ? `/${route}` : ""}.html`);
+    mkdirSync(path.dirname(file), { recursive: true });
+    writeFileSync(file, html);
   }
 }
 copyFileSync("dist/index.html", "dist/404.html");
