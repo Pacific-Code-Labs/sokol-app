@@ -9,7 +9,8 @@
     "langSwitchTo": "EN",
     "openMenu": "Abrir menú",
     "themeToLight": "Cambiar a modo claro",
-    "themeToDark": "Cambiar a modo oscuro"
+    "themeToDark": "Cambiar a modo oscuro",
+    "languageToggle": "Idioma actual: {current}. Cambiar a {next}."
   },
   "evaluator": {
     "badge": "NFPA · Costa Rica",

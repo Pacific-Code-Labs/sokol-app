@@ -9,7 +9,8 @@
     "langSwitchTo": "ES",
     "openMenu": "Open menu",
     "themeToLight": "Switch to light mode",
-    "themeToDark": "Switch to dark mode"
+    "themeToDark": "Switch to dark mode",
+    "languageToggle": "Current language: {current}. Switch to {next}."
   },
   "evaluator": {
     "badge": "NFPA · Costa Rica",

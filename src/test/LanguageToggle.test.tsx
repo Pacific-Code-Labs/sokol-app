@@ -11,7 +11,7 @@ vi.mock("@/contexts/LangContext", () => ({ useLang: () => {
   } };
 } }));
 beforeEach(() => { document.body.className = ""; });
-it("uses one SVG flag button and preserves the route, query and entered form data", async () => {
+it("shows the active SVG flag and preserves the route, query and entered form data", async () => {
   function Form() { const [value, setValue] = useState(""); return <input aria-label="Name" value={value} onChange={(e) => setValue(e.target.value)} />; }
   function Harness() {
     const location = useLocation();
@@ -19,7 +19,8 @@ it("uses one SVG flag button and preserves the route, query and entered form dat
   }
   render(<MemoryRouter initialEntries={["/es/register?source=demo"]}><Harness /></MemoryRouter>);
   fireEvent.change(screen.getByRole("textbox", { name: "Name" }), { target: { value: "Ana" } });
-  const english = screen.getByRole("button", { name: "English" });
+  const english = screen.getByRole("button", { name: "Idioma actual: Español. Cambiar a English." });
+  expect(english.querySelector("svg")).toHaveAttribute("data-language", "es");
   expect(english.querySelector("svg")).not.toBeNull();
   expect(english.textContent).toBe("");
   expect(screen.getAllByRole("button")).toHaveLength(1);
@@ -27,6 +28,7 @@ it("uses one SVG flag button and preserves the route, query and entered form dat
   fireEvent.click(english);
   await waitFor(() => expect(screen.getByText("/en/register?source=demo")).toBeInTheDocument());
   expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Ana");
-  expect(screen.getByRole("button", { name: "Español" })).toBeInTheDocument();
+  const switched = screen.getByRole("button", { name: "Current language: English. Switch to Español." });
+  expect(switched.querySelector("svg")).toHaveAttribute("data-language", "en");
   expect(screen.getAllByRole("button")).toHaveLength(1);
 });
