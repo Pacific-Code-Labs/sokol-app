@@ -35,12 +35,12 @@ export default function AssistantGuide() {
       </Card>
       <div className="grid gap-4 md:grid-cols-2">
         {topics.map(topic => (
-          <Card key={topic} className="flex flex-col">
+          <Card key={topic} className="flex flex-col md:row-span-4 md:grid md:grid-rows-subgrid md:gap-0">
             <CardHeader><CardTitle className="text-lg">{tr[`guide_${topic}_title`]}</CardTitle><CardDescription>{tr[`guide_${topic}_desc`]}</CardDescription></CardHeader>
-            <CardContent className="flex flex-1 flex-col gap-3">
+            <CardContent className="flex flex-1 flex-col gap-3 md:row-span-3 md:grid md:grid-rows-subgrid">
               <blockquote className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm leading-relaxed">{tr[`guide_${topic}_prompt`]}</blockquote>
               <p className="text-sm text-muted-foreground">{tr[`guide_${topic}_outcome`]}</p>
-              <Button className="mt-auto self-start gap-2" variant="outline" onClick={() => {
+              <Button className="mt-auto self-start gap-2 md:justify-self-start" variant="outline" onClick={() => {
                 assistant.setChatInput(tr[`guide_${topic}_prompt`]);
                 assistant.setOpen(true);
               }}><MessageCircle className="h-4 w-4" />{tr.guide_try}</Button>
