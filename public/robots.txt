@@ -1,3 +1,4 @@
-# The signed-in app is not for search engines; the landing (sokol.jcampos.dev) is.
+# Public app shells are fetchable so their noindex can be read.
+# Private records remain protected by authentication and authorization.
 User-agent: *
-Disallow: /
+Allow: /
